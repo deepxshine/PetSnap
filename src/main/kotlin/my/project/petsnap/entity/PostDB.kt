@@ -8,7 +8,6 @@ data class PostDB(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    var userId: Long,
     var image: String,
     var post: String,
     var postTime: LocalDateTime = LocalDateTime.now(),

@@ -8,8 +8,6 @@ data class CommentDB(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long? = null,
-    var userId: Long,
-    var postId: Long,
     var comment: String,
     var commentTime: LocalDateTime,
 
