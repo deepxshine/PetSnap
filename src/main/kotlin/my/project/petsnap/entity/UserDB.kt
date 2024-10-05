@@ -13,9 +13,9 @@ data class UserDB(
     @Column(unique = true)
     var username: String,
     var password: String,
-    var gender: Int,
     var birthday: LocalDate,
     var avatar: String, // path to pic
+    var bio: String,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var posts: MutableList<PostDB> = mutableListOf(),
