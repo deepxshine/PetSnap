@@ -47,9 +47,25 @@ class UserController(
         @Parameter(description = "Avatar file", required = true) @RequestPart file: MultipartFile,
     ): ResponseEntity<Any> {
 
-        val user = changeUserInfo(username, password, birthday, bio, file)
+        val errorResponse = changeUserInfo(username, birthday, file)
+        if (errorResponse != null) {
+            return errorResponse
+        }
+        // generate image url
+        val avatarUrl = generateUrl(file)
 
-        userService.register(user)
+        // change birthday String to localDate
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val localDateBirthday = LocalDate.parse(birthday, formatter)
+
+        val newUser = InputUserInfoRequestDTO(
+            username = username,
+            password = password,
+            birthday = localDateBirthday,
+            avatar = avatarUrl,
+            bio = bio
+        )
+        userService.register(newUser)
         logger.info("User registered successfully: $username")
         return ResponseEntity.ok(mapOf("message" to "User registered successfully"))
     }
@@ -69,7 +85,12 @@ class UserController(
 
     @GetMapping("/userProfile/{userId}")
     @Operation(summary = "Get user profile")
-    fun getProfile(@Parameter(description = "User ID", required = true) @PathVariable userId: Long,): ResponseEntity<Any> {
+    fun getProfile(
+        @Parameter(
+            description = "User ID",
+            required = true
+        ) @PathVariable userId: Long,
+    ): ResponseEntity<Any> {
         val existingUser = userService.getUserProfile(userId)
         return if (existingUser != null) {
             ResponseEntity.ok(existingUser)
@@ -89,9 +110,25 @@ class UserController(
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Any> {
 
-        val editedUser = changeUserInfo(username, password, birthday, bio, file)
-        userService.editProfile(userId, editedUser)
+        val errorResponse = changeUserInfo(username, birthday, file)
+        if (errorResponse != null) {
+            return errorResponse
+        }
+        // generate image url
+        val avatarUrl = generateUrl(file)
 
+        // change birthday String to localDate
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val localDateBirthday = LocalDate.parse(birthday, formatter)
+
+        val editedUser = InputUserInfoRequestDTO(
+            username = username,
+            password = password,
+            birthday = localDateBirthday,
+            avatar = avatarUrl,
+            bio = bio
+        )
+        userService.editProfile(userId, editedUser)
         return ResponseEntity.ok(mapOf("message" to "Profile edited successfully"))
     }
 
@@ -115,8 +152,15 @@ class UserController(
         @Parameter(description = "Following ID", required = true) @PathVariable followingId: Long,
     ): ResponseEntity<Any> {
         return try {
-            userService.followUser(followerId, followingId)
-            ResponseEntity.ok(mapOf("message" to "User followed successfully"))
+            if (followingId == followerId) {
+                ResponseEntity.badRequest().body(mapOf("error" to "You can not follow yourself"))
+            } else {
+                val result = userService.followUser(followerId, followingId)
+                if (result) {
+                    ResponseEntity.ok(mapOf("message" to "User followed successfully"))
+                } else ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(mapOf("error" to "This user is already in your following list")) // если подписан, то не нужно повторно подписаться
+            }
         } catch (e: RuntimeException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
         }
@@ -129,10 +173,18 @@ class UserController(
         @Parameter(description = "Following ID", required = true) @PathVariable followingId: Long,
     ): ResponseEntity<Any> {
         return try {
-            val result = userService.unfollowUser(followerId, followingId) // узнать, подписан ли пользователь на другого пользователя
-            if (result) {
-                ResponseEntity.ok(mapOf("message" to "User unfollowed successfully"))
-            } else ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "This user is not in your following list")) // если не подписан, то не нужно отписаться
+            if (followingId == followerId) {
+                ResponseEntity.badRequest().body(mapOf("error" to "You can not unfollow yourself"))
+            } else {
+                val result = userService.unfollowUser(
+                    followerId,
+                    followingId
+                ) // узнать, подписан ли пользователь на другого пользователя
+                if (result) {
+                    ResponseEntity.ok(mapOf("message" to "User unfollowed successfully"))
+                } else ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(mapOf("error" to "This user is not in your following list")) // если не подписан, то не нужно отписаться
+            }
         } catch (e: RuntimeException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
         }
@@ -199,12 +251,12 @@ class UserController(
     }
 
     // change userInfo
-    private fun changeUserInfo(username: String, password: String, birthday: String, bio: String?, file: MultipartFile): InputUserInfoRequestDTO {
+    private fun changeUserInfo(username: String, birthday: String, file: MultipartFile): ResponseEntity<Any>? {
 
         // check birthday
         if (!isValidDateFormat(birthday)) {
             logger.error("Invalid birthday format: $birthday")
-            ResponseEntity.badRequest()
+            return ResponseEntity.badRequest()
                 .body(mapOf("message" to "Invalid birthday format. Expected format: yyyy-MM-dd"))
         }
 
@@ -212,32 +264,16 @@ class UserController(
         val existingUser = userService.searchUser(username)
         if (existingUser != null) {
             logger.error("User already exists: $username")
-            ResponseEntity.badRequest().body(mapOf("message" to "This user already exists"))
+            return ResponseEntity.badRequest().body(mapOf("message" to "This user already exists"))
         }
 
         // check if file is an image
         if (!isImageFile(file)) {
             logger.error("Uploaded file is not an image: ${file.originalFilename}")
-            ResponseEntity.badRequest().body(mapOf("message" to "Uploaded file is not an image"))
+            return ResponseEntity.badRequest().body(mapOf("message" to "Uploaded file is not an image"))
         }
 
-        // generate image url
-        val avatarUrl = generateUrl(file)
-        logger.info("Generated avatar URL: $avatarUrl")
-
-        // change birthday String to localDate
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val localDateBirthday = LocalDate.parse(birthday, formatter)
-        logger.info("Parsed birthday: $localDateBirthday")
-
-        val user = InputUserInfoRequestDTO(
-            username = username,
-            password = password,
-            birthday = localDateBirthday,
-            avatar = avatarUrl,
-            bio = bio
-        )
-        return user
+        return null
     }
 
 }

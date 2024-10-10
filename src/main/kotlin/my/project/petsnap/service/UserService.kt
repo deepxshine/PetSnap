@@ -86,7 +86,7 @@ class UserService(
         }
     }
 
-    fun followUser(followerId: Long, followingId: Long) {
+    fun followUser(followerId: Long, followingId: Long): Boolean {
         val follower = userRepository.findById(followerId).orElseThrow { RuntimeException("Follower not found") }
         val following =
             userRepository.findById(followingId).orElseThrow { RuntimeException("Following not found") }
@@ -96,6 +96,9 @@ class UserService(
         if (existingFriendship == null) {
             val friendship = FriendshipDB(follower = follower, following = following)
             friendshipRepository.save(friendship)
+            return true
+        } else {
+            return false
         }
     }
 
