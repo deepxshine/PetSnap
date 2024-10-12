@@ -5,7 +5,10 @@ import my.project.petsnap.entity.FriendshipDB
 import my.project.petsnap.entity.UserDB
 import my.project.petsnap.exception.UserNotFoundException
 import my.project.petsnap.repository.FriendshipRepository
+import my.project.petsnap.repository.PostRepository
 import my.project.petsnap.repository.UserRepository
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -14,6 +17,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val friendshipRepository: FriendshipRepository,
     private val passwordEncoder: PasswordEncoder,
+    private val postRepository: PostRepository,
 ) {
 
     fun register(user: InputUserInfoRequestDTO) {
@@ -41,16 +45,16 @@ class UserService(
     }
 
     fun editProfile(userId: Long, userInfo: InputUserInfoRequestDTO) {
-        val existingUser = userRepository.findById(userId)
+        val user = userRepository.findById(userId)
             .orElseThrow { UserNotFoundException("User not found") }
         // Обновить данные пользователя
-        existingUser.username = userInfo.username
-        existingUser.password = userInfo.password
-        existingUser.birthday = userInfo.birthday
-        existingUser.avatar = userInfo.avatar
-        existingUser.bio = userInfo.bio
+        user.username = userInfo.username
+        user.password = passwordEncoder.encode(userInfo.password)
+        user.birthday = userInfo.birthday
+        user.avatar = userInfo.avatar
+        user.bio = userInfo.bio
 
-        userRepository.save(existingUser)
+        userRepository.save(user)
     }
 
     fun searchUser(username: String): UserSearchResponseDTO? {
@@ -68,23 +72,39 @@ class UserService(
 
     }
 
-    fun getUserProfile(userId: Long): UserPageResponseDTO? {
-        val existingUser = userRepository.findById(userId).orElse(null)
-        return if (existingUser != null) {
-            val userInfo = UserPageResponseDTO(
-                id = existingUser.id!!,
-                username = existingUser.username,
-                avatar = existingUser.avatar,
-                bio = existingUser.bio,
-                posts = existingUser.posts,
-                likes = existingUser.likes,
-                comments = existingUser.comments
-            )
-            userInfo
+    fun getUserPage(userId: Long, page: Int, size: Int): UserPageResponseDTO? {
+        val user = userRepository.findById(userId).orElse(null)
+        if (user == null) {
+            return null
         } else {
-            null
+            // get all posts by PostTime Descending, and paginate them
+            val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "postTime"))
+            val postsPage = postRepository.findByUser(user, pageable)
+
+            val postsList = postsPage.content.map { post ->
+                PostResponseDTO(
+                    id = post.id!!,
+                    image = post.image,
+                    text = post.text,
+                    postTime = post.postTime,
+                    comments = post.comments,
+                    likes = post.likes,
+                )
+
+            }
+
+            return UserPageResponseDTO(
+                id = user.id!!,
+                username = user.username,
+                avatar = user.avatar,
+                bio = user.bio,
+                posts = postsList,
+                likes = user.likes,
+                comments = user.comments
+            )
         }
     }
+
 
     fun followUser(followerId: Long, followingId: Long): Boolean {
         val follower = userRepository.findById(followerId).orElseThrow { RuntimeException("Follower not found") }

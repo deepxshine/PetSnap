@@ -9,7 +9,8 @@ data class UserPageResponseDTO(
     val username: String,
     val avatar: String,
     val bio: String?,
-    val posts: List<PostDB>,
+    val posts: List<PostResponseDTO>,
     val likes: List<LikeDB>,
     val comments: List<CommentDB>
+
 )

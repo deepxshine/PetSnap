@@ -5,23 +5,15 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import my.project.petsnap.dto.LoginRequestDTO
 import my.project.petsnap.dto.InputUserInfoRequestDTO
-import my.project.petsnap.entity.UserDB
-import my.project.petsnap.exception.FileEmptyException
 import my.project.petsnap.service.JwtTokenService
 import my.project.petsnap.service.UserService
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication
+import my.project.petsnap.utils.DateUtils
+import my.project.petsnap.utils.ImageUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.util.*
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
 
@@ -31,9 +23,8 @@ import org.slf4j.Logger
 @Tag(name = "User API", description = "Operations pertaining to users")
 class UserController(
     private val userService: UserService,
-    @Value("\${upload.path}") private val uploadPath: String,
     private val jwtTokenService: JwtTokenService,
-
+    private val imageUtils: ImageUtils,
     ) {
     private val logger: Logger = LoggerFactory.getLogger(UserController::class.java)
 
@@ -47,24 +38,14 @@ class UserController(
         @Parameter(description = "Avatar file", required = true) @RequestPart file: MultipartFile,
     ): ResponseEntity<Any> {
 
-        val errorResponse = changeUserInfo(username, birthday, file)
-        if (errorResponse != null) {
-            return errorResponse
+        val userInfoResponse = changeUserInfo(username, password, birthday, bio, file)
+
+        if (userInfoResponse.statusCode != HttpStatus.OK) {
+            return userInfoResponse
         }
-        // generate image url
-        val avatarUrl = generateUrl(file)
+        // если всё ок, то достанем userInfo из response
+        val newUser = userInfoResponse.body as InputUserInfoRequestDTO // превращает response.entity<any> в InputUserInfoRequestDTO
 
-        // change birthday String to localDate
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val localDateBirthday = LocalDate.parse(birthday, formatter)
-
-        val newUser = InputUserInfoRequestDTO(
-            username = username,
-            password = password,
-            birthday = localDateBirthday,
-            avatar = avatarUrl,
-            bio = bio
-        )
         userService.register(newUser)
         logger.info("User registered successfully: $username")
         return ResponseEntity.ok(mapOf("message" to "User registered successfully"))
@@ -83,17 +64,16 @@ class UserController(
         }
     }
 
-    @GetMapping("/userProfile/{userId}")
-    @Operation(summary = "Get user profile")
-    fun getProfile(
-        @Parameter(
-            description = "User ID",
-            required = true
-        ) @PathVariable userId: Long,
+    @GetMapping("/userPage/{userId}")
+    @Operation(summary = "Get user page")
+    fun getUserPage(
+        @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
+        @Parameter(description = "Page number", required = false) @RequestParam(defaultValue = "0") page: Int,
+        @Parameter(description = "Page size", required = false) @RequestParam(defaultValue = "9") size: Int
     ): ResponseEntity<Any> {
-        val existingUser = userService.getUserProfile(userId)
-        return if (existingUser != null) {
-            ResponseEntity.ok(existingUser)
+        val userPage = userService.getUserPage(userId, page, size)
+        return if (userPage != null) {
+            ResponseEntity.ok(userPage)
         } else {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "User not found"))
         }
@@ -110,24 +90,14 @@ class UserController(
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Any> {
 
-        val errorResponse = changeUserInfo(username, birthday, file)
-        if (errorResponse != null) {
-            return errorResponse
+        val userInfoResponse = changeUserInfo(username, password, birthday, bio, file)
+
+        if (userInfoResponse.statusCode != HttpStatus.OK) {
+            return userInfoResponse
         }
-        // generate image url
-        val avatarUrl = generateUrl(file)
+        // если всё ок, то достанем userInfo из response
+        val editedUser = userInfoResponse.body as InputUserInfoRequestDTO
 
-        // change birthday String to localDate
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val localDateBirthday = LocalDate.parse(birthday, formatter)
-
-        val editedUser = InputUserInfoRequestDTO(
-            username = username,
-            password = password,
-            birthday = localDateBirthday,
-            avatar = avatarUrl,
-            bio = bio
-        )
         userService.editProfile(userId, editedUser)
         return ResponseEntity.ok(mapOf("message" to "Profile edited successfully"))
     }
@@ -208,54 +178,11 @@ class UserController(
         return ResponseEntity.ok(followingsList)
     }
 
-    // check birthday input format
-    private fun isValidDateFormat(date: String): Boolean {
-        return try {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            LocalDate.parse(date, formatter)
-            true
-        } catch (e: DateTimeParseException) {
-            false
-        }
-    }
-
-    // check if uploaded file is an  image file
-    private fun isImageFile(file: MultipartFile): Boolean {
-        val contentType = file.contentType
-        return contentType != null && contentType.startsWith("image")
-    }
-
-    // generate url from image
-    private fun generateUrl(file: MultipartFile): String {
-
-        if (file.isEmpty) {
-            throw FileEmptyException("File is empty")
-        }
-
-        return try {
-            // UUID: Universally Unique Identifier -- 32 hexadecimal digits + file type
-            val fileName = UUID.randomUUID().toString() + "." + file.originalFilename?.substringAfterLast(".")
-            // filePath = uploadPath/filename
-            val filePath = Paths.get(uploadPath, fileName)
-            // copy the file from inputStream to filePath
-            Files.copy(file.inputStream, filePath)
-
-            // create a URL for imageFile
-            ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/uploads/")
-                .path(fileName)
-                .toUriString()
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to upload file", e)
-        }
-    }
-
     // change userInfo
-    private fun changeUserInfo(username: String, birthday: String, file: MultipartFile): ResponseEntity<Any>? {
+    private fun changeUserInfo(username: String, password: String, birthday: String, bio: String?, file: MultipartFile): ResponseEntity<Any> {
 
         // check birthday
-        if (!isValidDateFormat(birthday)) {
-            logger.error("Invalid birthday format: $birthday")
+        if (!DateUtils.isValidDateFormat(birthday)) {
             return ResponseEntity.badRequest()
                 .body(mapOf("message" to "Invalid birthday format. Expected format: yyyy-MM-dd"))
         }
@@ -263,17 +190,29 @@ class UserController(
         // check if user exists
         val existingUser = userService.searchUser(username)
         if (existingUser != null) {
-            logger.error("User already exists: $username")
             return ResponseEntity.badRequest().body(mapOf("message" to "This user already exists"))
         }
 
         // check if file is an image
-        if (!isImageFile(file)) {
-            logger.error("Uploaded file is not an image: ${file.originalFilename}")
+        if (!imageUtils.isImageFile(file)) {
             return ResponseEntity.badRequest().body(mapOf("message" to "Uploaded file is not an image"))
         }
 
-        return null
+        // generate image url
+        val avatarUrl = imageUtils.generateUrl(file)
+
+        // change birthday String to localDate
+        val localDateBirthday = DateUtils.changeDateFormat(birthday)
+
+        // generate user info
+        val userInfo = InputUserInfoRequestDTO(
+            username = username,
+            password = password,
+            birthday = localDateBirthday,
+            avatar = avatarUrl,
+            bio = bio
+        )
+        return ResponseEntity.ok(userInfo)
     }
 
 }
