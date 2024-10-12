@@ -9,7 +9,6 @@ import my.project.petsnap.service.JwtTokenService
 import my.project.petsnap.service.UserService
 import my.project.petsnap.utils.DateUtils
 import my.project.petsnap.utils.ImageUtils
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
