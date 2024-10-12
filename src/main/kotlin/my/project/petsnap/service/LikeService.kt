@@ -30,7 +30,9 @@ class LikeService(
         }
 
         val like = LikeDB(user = user, post = post)
+
         likeRepository.save(like)
+
         val likeResponse = LikeResponseDTO(
             id = like.id!!,
             user = UserSearchResponseDTO(
@@ -56,7 +58,6 @@ class LikeService(
         if (like == null) {
             return ResponseEntity.badRequest().body("User has not liked this post")
         } else {
-            likeRepository.delete(like)
             val likeRemoveResponse = LikeResponseDTO(
                 id = like.id!!,
                 user = UserSearchResponseDTO(
@@ -70,6 +71,7 @@ class LikeService(
                     text = like.post.text,
                 )
             )
+            likeRepository.delete(like)
             return ResponseEntity.ok(mapOf("message" to "Removed like", "Removed" to likeRemoveResponse))
         }
     }

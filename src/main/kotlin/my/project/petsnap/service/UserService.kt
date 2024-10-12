@@ -5,6 +5,7 @@ import my.project.petsnap.entity.FriendshipDB
 import my.project.petsnap.entity.UserDB
 import my.project.petsnap.exception.UserNotFoundException
 import my.project.petsnap.repository.FriendshipRepository
+import my.project.petsnap.repository.LikeRepository
 import my.project.petsnap.repository.PostRepository
 import my.project.petsnap.repository.UserRepository
 import org.springframework.data.domain.PageRequest
@@ -18,6 +19,7 @@ class UserService(
     private val friendshipRepository: FriendshipRepository,
     private val passwordEncoder: PasswordEncoder,
     private val postRepository: PostRepository,
+    private val likeRepository: LikeRepository,
 ) {
 
     fun register(user: InputUserInfoRequestDTO) {
@@ -87,8 +89,10 @@ class UserService(
                     image = post.image,
                     text = post.text,
                     postTime = post.postTime,
-                    comments = post.comments,
-                    likes = post.likes,
+                    commentsCount = post.comments.count(),
+                    likesCount = post.likes.count(),
+                    likedByUser = likeRepository.existsByUserAndPost(user, post),
+
                 )
 
             }
@@ -98,9 +102,7 @@ class UserService(
                 username = user.username,
                 avatar = user.avatar,
                 bio = user.bio,
-                posts = postsList,
-                likes = user.likes,
-                comments = user.comments
+                posts = postsList
             )
         }
     }

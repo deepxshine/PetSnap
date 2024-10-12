@@ -17,5 +17,8 @@ data class CommentDB(
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    var user: UserDB
+    var user: UserDB,
+
+//    @OneToMany(mappedBy = "comment", cascade = [CascadeType.ALL], orphanRemoval = true)
+//    var likes: MutableList<LikeDB> = mutableListOf(),
 )
