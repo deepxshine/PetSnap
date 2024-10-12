@@ -3,9 +3,8 @@ package my.project.petsnap.service
 import my.project.petsnap.dto.PostResponseDTO
 import my.project.petsnap.dto.PostsOnMainPageResponseDTO
 import my.project.petsnap.dto.UserSearchResponseDTO
-import my.project.petsnap.entity.CommentDB
-import my.project.petsnap.entity.LikeDB
 import my.project.petsnap.entity.PostDB
+import my.project.petsnap.repository.LikeRepository
 import my.project.petsnap.repository.PostRepository
 import my.project.petsnap.repository.UserRepository
 import my.project.petsnap.utils.ImageUtils
@@ -22,6 +21,7 @@ class PostService(
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     private val imageUtils: ImageUtils,
+    private val likeRepository: LikeRepository,
 
     ) {
 
@@ -54,8 +54,9 @@ class PostService(
                 image = post.image,
                 text = post.text,
                 postTime = post.postTime,
-                comments = post.comments,
-                likes = post.likes,
+                commentsCount = post.comments.count(),
+                likesCount = post.likes.count(),
+                likedByUser = likeRepository.existsByUserAndPost(user, post),
             )
             return ResponseEntity.ok(createdPost)
         }
@@ -75,9 +76,11 @@ class PostService(
         }
     }
 
-    fun getAllPosts(page: Int, size: Int): Page<PostsOnMainPageResponseDTO> {
+    fun getAllPosts(page: Int, size: Int, userId: Long): Page<PostsOnMainPageResponseDTO> {
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "postTime"))
         val postsPage = postRepository.findAllByOrderByPostTimeDesc(pageable)
+
+        val user = userRepository.findById(userId).orElse(null)
 
         return postsPage.map { post ->
             PostsOnMainPageResponseDTO(
@@ -90,8 +93,9 @@ class PostService(
                     avatar = post.user.avatar
                 ),
                 postTime = post.postTime,
-                comments = post.comments,
-                likes = post.likes
+                commentsCount = post.comments.count(),
+                likesCount = post.likes.count(),
+                likedByUser = likeRepository.existsByUserAndPost(user, post),
             )
         }
     }

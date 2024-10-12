@@ -1,9 +1,7 @@
 package my.project.petsnap.utils
 
-import jakarta.annotation.PostConstruct
 import my.project.petsnap.exception.FileEmptyException
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
