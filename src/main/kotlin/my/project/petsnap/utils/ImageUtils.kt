@@ -28,6 +28,12 @@ class ImageUtils (
         }
 
         return try {
+            // if upload path doesn't exist, then create this path
+            val uploadDir = Paths.get(uploadPath)
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir)
+            }
+
             // UUID: Universally Unique Identifier -- 32 hexadecimal digits + file type
             val fileName = UUID.randomUUID().toString() + "." + file.originalFilename?.substringAfterLast(".")
             // filePath = uploadPath/filename
@@ -37,7 +43,7 @@ class ImageUtils (
 
             // create a URL for imageFile
             ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/uploads/")
+                .path("/static/uploads/")
                 .path(fileName)
                 .toUriString()
         } catch (e: Exception) {
