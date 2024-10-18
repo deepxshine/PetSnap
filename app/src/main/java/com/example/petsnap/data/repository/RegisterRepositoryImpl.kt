@@ -3,7 +3,7 @@ package com.example.petsnap.data.repository
 
 import com.example.petsnap.data.remote.RegisterService
 import com.example.petsnap.domain.model.RegisterResponse
-import com.example.petsnap.domain.repository.UserRepository
+import com.example.petsnap.domain.repository.RegisterRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -14,8 +14,8 @@ import java.io.File
 import javax.inject.Inject
 
 
-class UserRepositoryImpl @Inject constructor(private val registerService: RegisterService) :
-    UserRepository {
+class RegisterRepositoryImpl @Inject constructor(private val registerService: RegisterService) :
+    RegisterRepository {
 
     override suspend fun registerUser(
         username: String,
