@@ -12,9 +12,7 @@ import com.bumptech.glide.Glide
 import com.example.petsnap.R
 import com.example.petsnap.databinding.FragmentProfileBinding
 import com.example.petsnap.domain.model.User
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
