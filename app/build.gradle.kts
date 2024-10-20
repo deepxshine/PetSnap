@@ -42,7 +42,14 @@ android {
         viewBinding = true
         dataBinding = true
     }
+
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+    buildToolsVersion = "34.0.0"
 }
+
+
 
 dependencies {
 
@@ -84,5 +91,8 @@ dependencies {
 
     // Glide
     implementation(libs.glide)
+
+    // jwt-decode
+    implementation(libs.jwtdecode)
 }
 
