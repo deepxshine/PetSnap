@@ -2,6 +2,7 @@ package com.example.petsnap.data.repository
 
 
 import com.example.petsnap.data.remote.RegisterService
+import com.example.petsnap.domain.model.RegisterRequest
 import com.example.petsnap.domain.model.RegisterResponse
 import com.example.petsnap.domain.repository.RegisterRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -13,7 +14,6 @@ import retrofit2.Response
 import java.io.File
 import javax.inject.Inject
 
-
 class RegisterRepositoryImpl @Inject constructor(private val registerService: RegisterService) :
     RegisterRepository {
 
@@ -23,18 +23,21 @@ class RegisterRepositoryImpl @Inject constructor(private val registerService: Re
         birthday: String,
         bio: String?,
         file: File
-    ) : Response<RegisterResponse> {
-        val usernameBody = username.toRequestBody("text/plain".toMediaTypeOrNull())
-        val passwordBody = password.toRequestBody("text/plain".toMediaTypeOrNull())
-        val birthdayBody = birthday.toRequestBody("text/plain".toMediaTypeOrNull())
-        val bioBody = bio?.toRequestBody("text/plain".toMediaTypeOrNull())
+    ): Response<RegisterResponse> {
+        val registerRequest = RegisterRequest(username, password, birthday, bio, file)
+        val parts = registerRequest.toRequestParts()
+        val filePart = registerRequest.toFilePart()
 
-        val fileBody = file.asRequestBody("image/*".toMediaTypeOrNull())
-        val filePart = MultipartBody.Part.createFormData("file", file.name, fileBody)
-
-        val response = registerService.registerUser(usernameBody, passwordBody, birthdayBody, bioBody, filePart)
+        val response = registerService.registerUser(
+            parts.find { it.first == "username" }?.second ?: throw IllegalArgumentException("Username is missing"),
+            parts.find { it.first == "password" }?.second ?: throw IllegalArgumentException("Password is missing"),
+            parts.find { it.first == "birthday" }?.second ?: throw IllegalArgumentException("Birthday is missing"),
+            parts.find { it.first == "bio" }?.second,
+            filePart
+        )
         return response
     }
 }
+
 
 

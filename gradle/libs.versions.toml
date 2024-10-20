@@ -10,17 +10,18 @@ material = "1.12.0"
 constraintlayout = "2.1.4"
 lifecycleLivedataKtx = "2.8.6"
 lifecycleViewmodelKtx = "2.8.6"
-navigationFragmentKtx = "2.8.2"
-navigationUiKtx = "2.8.2"
+navigationFragmentKtx = "2.8.3"
+navigationUiKtx = "2.8.3"
 room = "2.6.1"
 ksp = "1.9.24-1.0.20"
 hilt = "2.48.1"
-safeargs = "2.8.2"
+safeargs = "2.8.3"
 kotlinPlugin = "1.8.10"
 retrofit = "2.9.0"
 coroutines = "1.7.3"
 okhttp = "4.9.3"
 glide = "4.15.1"
+jwtdecode = "2.0.0"
 
 
 [libraries]
@@ -49,6 +50,8 @@ retrofit_gson = { module = "com.squareup.retrofit2:converter-gson", version.ref 
 
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+
+jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "jwtdecode" }
 
 
 
