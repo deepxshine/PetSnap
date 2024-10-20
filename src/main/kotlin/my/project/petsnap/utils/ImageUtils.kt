@@ -12,6 +12,7 @@ import java.util.*
 @Component
 class ImageUtils (
      @Value("\${upload.path}") private val uploadPath: String,
+
 ) {
 
     // check if uploaded file is an  image file
@@ -43,7 +44,6 @@ class ImageUtils (
 
             // create a URL for imageFile
             ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/static/uploads/")
                 .path(fileName)
                 .toUriString()
         } catch (e: Exception) {
