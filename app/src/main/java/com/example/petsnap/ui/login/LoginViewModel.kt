@@ -16,20 +16,15 @@ class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepositoryImpl
 ) : ViewModel() {
 
-    val username = MutableLiveData<String>()
-    val password = MutableLiveData<String>()
-
     private val _loginResult = MutableLiveData<Resource<LoginResponse>>()
     val loginResult: LiveData<Resource<LoginResponse>> get() = _loginResult
 
-    fun login() {
-        val user = username.value ?: ""
-        val pass = password.value ?: ""
+    fun login(username: String, password: String) {
 
         // Начать авторизацию
         viewModelScope.launch {
             _loginResult.value = Resource.loading(null)
-            val result = loginRepository.login(user, pass)
+            val result = loginRepository.login(username, password)
             _loginResult.value = result
         }
     }
