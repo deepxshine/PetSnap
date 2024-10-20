@@ -1,5 +1,6 @@
 package com.example.petsnap.ui.profile
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,9 @@ import com.bumptech.glide.Glide
 import com.example.petsnap.R
 import com.example.petsnap.databinding.FragmentProfileBinding
 import com.example.petsnap.domain.model.User
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
@@ -32,10 +35,16 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userId = arguments?.getLong("userId") ?: return
+        val sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val userId = sharedPreferences.getLong("user_id", -1L)
 
-        // Загружаем профиль пользователя
-        viewModel.loadUserProfile(userId)
+        if (userId == -1L) {
+            Toast.makeText(requireContext(), "User ID not found", Toast.LENGTH_SHORT).show()
+            return
+        } else {
+            // Загружаем профиль пользователя
+            viewModel.loadUserProfile(userId)
+        }
 
         // Подписка на данные пользователя
         viewModel.user.observe(viewLifecycleOwner, Observer { user ->
@@ -58,7 +67,7 @@ class ProfileFragment : Fragment() {
             binding.bioTextView.text = user.bio ?: "No bio available"
 
             // Загрузка аватара с помощью Glide
-            Glide.with(this)
+            Glide.with(this@ProfileFragment)
                 .load(user.avatar)
                 .placeholder(R.drawable.ic_launcher_foreground) // Placeholder для загрузки
                 .error(R.drawable.ic_notifications_black_24dp) // Изображение на случай ошибки
