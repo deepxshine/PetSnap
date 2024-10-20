@@ -56,7 +56,7 @@ class UserController(
         val user = userService.login(loginRequest.username, loginRequest.password)
         if (user != null) {
             val token = jwtTokenService.generateToken(user.username)
-            return ResponseEntity.ok(mapOf("token" to token))
+            return ResponseEntity.ok(mapOf("token" to token, "userId" to user.id))
             // mapOf - функция, которая создает неизменяемый словарь (Map) в Kotlin. Она принимает пары "ключ-значение" и возвращает объект типа Map<K, V>, где K — тип ключа, а V — тип значения. В данном случае, ключом является строка "token", а значением — переменная token. Оператор to в Kotlin используется для создания пары (Pair).
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("error" to "User doesn't exist"))
