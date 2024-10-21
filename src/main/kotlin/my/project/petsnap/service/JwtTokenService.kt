@@ -4,10 +4,12 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import javax.crypto.SecretKey
 
 @Service
+@Transactional
 class JwtTokenService {
 
     private val secretKey: SecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512)

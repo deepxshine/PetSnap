@@ -15,8 +15,8 @@ data class UserDB(
     @Column(unique = true)
     var username: String,
     var password: String,
-    var birthday: LocalDate,
-    var avatar: String, // path to pic
+    var birthday: LocalDate?=null,
+    var avatar: String?=null, // path to pic
     var bio: String?=null,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)

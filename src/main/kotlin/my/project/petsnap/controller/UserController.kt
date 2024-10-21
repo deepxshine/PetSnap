@@ -7,8 +7,6 @@ import my.project.petsnap.dto.LoginRequestDTO
 import my.project.petsnap.dto.InputUserInfoRequestDTO
 import my.project.petsnap.service.JwtTokenService
 import my.project.petsnap.service.UserService
-import my.project.petsnap.utils.DateUtils
-import my.project.petsnap.utils.ImageUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -22,9 +20,8 @@ import org.slf4j.Logger
 @Tag(name = "User API", description = "Operations pertaining to users")
 class UserController(
     private val userService: UserService,
-    private val jwtTokenService: JwtTokenService,
-    private val imageUtils: ImageUtils,
-    ) {
+    private val jwtTokenService: JwtTokenService
+) {
     private val logger: Logger = LoggerFactory.getLogger(UserController::class.java)
 
     @PostMapping("/register", consumes = ["multipart/form-data"]) // для загрузки аватара
@@ -32,14 +29,14 @@ class UserController(
     fun register(
         @Parameter(description = "Username", required = true) @RequestParam username: String,
         @Parameter(description = "Password", required = true) @RequestParam password: String,
-        @Parameter(description = "Birthday", required = true) @RequestParam birthday: String,
+        @Parameter(description = "Birthday", required = false) @RequestParam birthday: String?,
         @Parameter(description = "Bio", required = false) @RequestParam bio: String?,
-        @Parameter(description = "Avatar file", required = true) @RequestPart file: MultipartFile,
+        @Parameter(description = "Avatar file", required = false) @RequestPart file: MultipartFile?,
     ): ResponseEntity<Any> {
 
-        val userInfoResponse = changeUserInfo(username, password, birthday, bio, file)
+        val userInfoResponse = userService.changeUserInfo(username, password, birthday, bio, file)
 
-        if (userInfoResponse.statusCode != HttpStatus.OK) {
+        if (!userInfoResponse.statusCode.is2xxSuccessful) {
             return userInfoResponse
         }
         // если всё ок, то достанем userInfo из response
@@ -68,7 +65,7 @@ class UserController(
     fun getUserPage(
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
         @Parameter(description = "Page number", required = false) @RequestParam(defaultValue = "0") page: Int,
-        @Parameter(description = "Page size", required = false) @RequestParam(defaultValue = "9") size: Int
+        @Parameter(description = "Page size", required = false) @RequestParam(defaultValue = "9") size: Int,
     ): ResponseEntity<Any> {
         val userPage = userService.getUserPage(userId, page, size)
         return if (userPage != null) {
@@ -89,9 +86,9 @@ class UserController(
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Any> {
 
-        val userInfoResponse = changeUserInfo(username, password, birthday, bio, file)
+        val userInfoResponse = userService.changeUserInfo(username, password, birthday, bio, file)
 
-        if (userInfoResponse.statusCode != HttpStatus.OK) {
+        if (userInfoResponse.statusCode != ResponseEntity.ok(mapOf("message" to "User updated successfully"))) {
             return userInfoResponse
         }
         // если всё ок, то достанем userInfo из response
@@ -177,41 +174,5 @@ class UserController(
         return ResponseEntity.ok(followingsList)
     }
 
-    // change userInfo
-    private fun changeUserInfo(username: String, password: String, birthday: String, bio: String?, file: MultipartFile): ResponseEntity<Any> {
-
-        // check birthday
-        if (!DateUtils.isValidDateFormat(birthday)) {
-            return ResponseEntity.badRequest()
-                .body(mapOf("message" to "Invalid birthday format. Expected format: yyyy-MM-dd"))
-        }
-
-        // check if user exists
-        val existingUser = userService.searchUser(username)
-        if (existingUser != null) {
-            return ResponseEntity.badRequest().body(mapOf("message" to "This user already exists"))
-        }
-
-        // check if file is an image
-        if (!imageUtils.isImageFile(file)) {
-            return ResponseEntity.badRequest().body(mapOf("message" to "Uploaded file is not an image"))
-        }
-
-        // generate image url
-        val avatarUrl = imageUtils.generateUrl(file)
-
-        // change birthday String to localDate
-        val localDateBirthday = DateUtils.changeDateFormat(birthday)
-
-        // generate user info
-        val userInfo = InputUserInfoRequestDTO(
-            username = username,
-            password = password,
-            birthday = localDateBirthday,
-            avatar = avatarUrl,
-            bio = bio
-        )
-        return ResponseEntity.ok(userInfo)
-    }
 
 }

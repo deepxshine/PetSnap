@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
+@Transactional
 class CommentService(
     private val commentRepository: CommentRepository,
     private val userRepository: UserRepository,

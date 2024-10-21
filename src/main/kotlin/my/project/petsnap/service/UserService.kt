@@ -8,18 +8,25 @@ import my.project.petsnap.repository.FriendshipRepository
 import my.project.petsnap.repository.LikeRepository
 import my.project.petsnap.repository.PostRepository
 import my.project.petsnap.repository.UserRepository
+import my.project.petsnap.utils.DateUtils
+import my.project.petsnap.utils.ImageUtils
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
+@Transactional
 class UserService(
     private val userRepository: UserRepository,
     private val friendshipRepository: FriendshipRepository,
     private val passwordEncoder: PasswordEncoder,
     private val postRepository: PostRepository,
     private val likeRepository: LikeRepository,
+    private val imageUtils: ImageUtils,
 ) {
 
     fun register(user: InputUserInfoRequestDTO) {
@@ -158,6 +165,50 @@ class UserService(
             )
         }
         return followingsList
+    }
+
+    // change userInfo
+    fun changeUserInfo(
+        username: String,
+        password: String,
+        birthday: String?,
+        bio: String?,
+        file: MultipartFile?,
+    ): ResponseEntity<Any> {
+
+        // check birthday
+        if (!birthday.isNullOrEmpty() && !DateUtils.isValidDateFormat(birthday)) {
+            return ResponseEntity.badRequest()
+                .body(mapOf("message" to "Invalid birthday format. Expected format: yyyy-MM-dd"))
+        }
+
+        // check if user exists
+        val existingUser = searchUser(username)
+        if (existingUser != null) {
+            return ResponseEntity.badRequest().body(mapOf("message" to "This user already exists"))
+        }
+
+        // check if file is an image
+        if (file != null && !imageUtils.isImageFile(file)) {
+            return ResponseEntity.badRequest().body(mapOf("message" to "Uploaded file is not an image"))
+        }
+
+        // generate image url
+        val avatarUrl = if (file != null) {imageUtils.generateUrl(file)} else null
+
+
+        // change birthday String to localDate
+        val localDateBirthday = if (!birthday.isNullOrEmpty()) {DateUtils.changeDateFormat(birthday)} else null
+
+        // generate user info
+        val userInfo = InputUserInfoRequestDTO(
+            username = username,
+            password = password,
+            birthday = localDateBirthday,
+            avatar = avatarUrl,
+            bio = bio
+        )
+        return ResponseEntity.ok(userInfo)
     }
 
 }
