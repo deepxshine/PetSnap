@@ -15,8 +15,4 @@ data class LikeDB(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     var post: PostDB,
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "comment_id")
-//    var comment: CommentDB?
 )

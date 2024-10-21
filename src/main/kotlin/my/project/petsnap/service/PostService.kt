@@ -13,10 +13,12 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
+@Transactional
 class PostService(
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
@@ -93,6 +95,7 @@ class PostService(
                     avatar = post.user.avatar
                 ),
                 postTime = post.postTime,
+                // todo: comments
                 commentsCount = post.comments.count(),
                 likesCount = post.likes.count(),
                 likedByUser = likeRepository.existsByUserAndPost(user, post),

@@ -10,10 +10,9 @@ import java.nio.file.Paths
 import java.util.*
 
 @Component
-class ImageUtils (
-     @Value("\${upload.path}") private val uploadPath: String,
-
-) {
+class ImageUtils(
+    @Value("\${upload.path}") private val uploadPath: String,
+    ) {
 
     // check if uploaded file is an  image file
     fun isImageFile(file: MultipartFile): Boolean {
@@ -28,7 +27,7 @@ class ImageUtils (
             throw FileEmptyException("File is empty")
         }
 
-        return try {
+        try {
             // if upload path doesn't exist, then create this path
             val uploadDir = Paths.get(uploadPath)
             if (!Files.exists(uploadDir)) {
@@ -43,9 +42,11 @@ class ImageUtils (
             Files.copy(file.inputStream, filePath)
 
             // create a URL for imageFile
-            ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(fileName)
-                .toUriString()
+            val avatarUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                            .path(fileName)
+                            .toUriString()
+
+            return avatarUrl
         } catch (e: Exception) {
             throw RuntimeException("Failed to upload file", e)
         }
