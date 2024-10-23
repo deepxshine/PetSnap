@@ -8,8 +8,8 @@ interface RegisterRepository {
     suspend fun registerUser(
         username: String,
         password: String,
-        birthday: String,
+        birthday: String?,
         bio: String?,
-        file: File
+        file: File?
     ): Response<RegisterResponse>
 }

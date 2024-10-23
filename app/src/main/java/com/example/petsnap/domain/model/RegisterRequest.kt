@@ -10,16 +10,18 @@ import java.io.File
 data class RegisterRequest(
     val username: String,
     val password: String,
-    val birthday: String,
+    val birthday: String?,
     val bio: String?,
-    val file: File
+    val file: File?
 ) {
     fun toRequestParts(): List<Pair<String, RequestBody>> {
         val parts = mutableListOf<Pair<String, RequestBody>>()
 
         parts.add("username" to username.toRequestBody("text/plain".toMediaTypeOrNull()))
         parts.add("password" to password.toRequestBody("text/plain".toMediaTypeOrNull()))
-        parts.add("birthday" to birthday.toRequestBody("text/plain".toMediaTypeOrNull()))
+        birthday?.let {
+            parts.add("birthday" to it.toRequestBody("text/plain".toMediaTypeOrNull()))
+        }
         bio?.let {
             parts.add("bio" to it.toRequestBody("text/plain".toMediaTypeOrNull()))
         }
@@ -27,9 +29,11 @@ data class RegisterRequest(
         return parts
     }
 
-    fun toFilePart(): MultipartBody.Part {
-        val fileBody = file.asRequestBody("image/*".toMediaTypeOrNull())
-        return MultipartBody.Part.createFormData("file", file.name, fileBody)
+    fun toFilePart(): MultipartBody.Part? {
+        return file?.let {
+            val fileBody = it.asRequestBody("image/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("file", file.name, fileBody)
+        }
     }
 }
 
