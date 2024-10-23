@@ -22,6 +22,9 @@ coroutines = "1.7.3"
 okhttp = "4.9.3"
 glide = "4.15.1"
 jwtdecode = "2.0.0"
+gridlayout = "1.0.0"
+paging = "3.3.2"
+kotlinx = "1.6.3"
 
 
 [libraries]
@@ -52,6 +55,12 @@ hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-comp
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 
 jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "jwtdecode" }
+androidx-gridlayout = { group = "androidx.gridlayout", name = "gridlayout", version.ref = "gridlayout" }
+
+paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
+
+kotlinx = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx"}
+
 
 
 

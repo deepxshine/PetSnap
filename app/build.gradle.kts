@@ -73,6 +73,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.gridlayout)
     ksp(libs.hilt.android.compiler)
 
     //Room
@@ -94,5 +95,11 @@ dependencies {
 
     // jwt-decode
     implementation(libs.jwtdecode)
+
+    // Paging 3
+    implementation(libs.paging.runtime)
+
+    // Serialization
+    implementation(libs.kotlinx)
 }
 

@@ -20,7 +20,8 @@ import javax.inject.Singleton
 object UserRepositoryModule {
 
     @Provides
-    fun provideUserRepository(registerService: RegisterService) : RegisterRepository {
+    @Singleton
+    fun provideUserRegisterRepository(registerService: RegisterService) : RegisterRepository {
         return RegisterRepositoryImpl(registerService)
     }
 

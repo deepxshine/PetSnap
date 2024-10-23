@@ -1,6 +1,7 @@
 package com.example.petsnap.di
 
 import com.example.petsnap.data.remote.LoginService
+import com.example.petsnap.data.remote.PostService
 import com.example.petsnap.data.remote.RegisterService
 import com.example.petsnap.data.remote.UserService
 import dagger.Module
@@ -26,7 +27,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://your_ip_here:8080/")
+            .baseUrl("http://192.168.0.175:8080/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create()) // Для JSON
             .build()
@@ -48,5 +49,11 @@ object NetworkModule {
     @Singleton
     fun provideLoginService(retrofit: Retrofit): LoginService {
         return retrofit.create(LoginService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providePostService(retrofit: Retrofit): PostService {
+        return retrofit.create(PostService::class.java)
     }
 }
