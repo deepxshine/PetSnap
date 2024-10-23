@@ -50,6 +50,16 @@ class RegisterActivity : AppCompatActivity() {
             val bio = binding.regBio.text.toString()
             val file = selectedFile
 
+            if (username.isEmpty()) {
+                Toast.makeText(this, "Username cannot be empty", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (password.isEmpty()) {
+                Toast.makeText(this, "Password cannot be empty", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (file != null) {
                 if (file.length() > 10 * 1024 * 1024) { // если фото больше 10mb
                     Toast.makeText(
@@ -57,12 +67,10 @@ class RegisterActivity : AppCompatActivity() {
                         "File size exceeds the limit (10MB)",
                         Toast.LENGTH_SHORT
                     ).show()
-                } else {
-                    viewModel.registerUser(username, password, birthday, bio, file)
                 }
-            } else {
-                Toast.makeText(this, "Please select a file", Toast.LENGTH_SHORT).show()
             }
+
+            viewModel.registerUser(username, password, birthday, bio, file)
         }
 
         viewModel.registerResult.observe(this) { result ->
@@ -81,7 +89,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
 
                 Status.LOADING -> {
-                    // todo: Handle loading state
+                    print("")
                 }
             }
         }

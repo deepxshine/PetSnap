@@ -15,9 +15,9 @@ interface RegisterService {
     suspend fun registerUser(
         @Part("username") username: RequestBody,
         @Part("password") password: RequestBody,
-        @Part("birthday") birthday: RequestBody,
+        @Part("birthday") birthday: RequestBody?,
         @Part("bio") bio: RequestBody?,
-        @Part file: MultipartBody.Part
+        @Part file: MultipartBody.Part?
     ): Response<RegisterResponse>
 
 }
