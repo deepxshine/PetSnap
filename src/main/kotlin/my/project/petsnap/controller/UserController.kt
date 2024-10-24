@@ -34,6 +34,13 @@ class UserController(
         @Parameter(description = "Avatar file", required = false) @RequestPart file: MultipartFile?,
     ): ResponseEntity<Any> {
 
+        val existUser = userService.existUser(username)
+
+        if (existUser) {
+            return ResponseEntity.badRequest()
+            .body(mapOf("message" to "User already exists"))
+        }
+
         val userInfoResponse = userService.changeUserInfo(username, password, birthday, bio, file)
 
         if (!userInfoResponse.statusCode.is2xxSuccessful) {
@@ -80,15 +87,22 @@ class UserController(
     fun editProfile(
         @Parameter(description = "Username", required = true) @RequestParam username: String,
         @Parameter(description = "Password", required = true) @RequestParam password: String,
-        @Parameter(description = "Birthday", required = true) @RequestParam birthday: String,
+        @Parameter(description = "Birthday", required = false) @RequestParam birthday: String?,
         @Parameter(description = "Bio", required = false) @RequestParam bio: String?,
-        @Parameter(description = "Avatar file", required = true) @RequestPart file: MultipartFile,
+        @Parameter(description = "Avatar file", required = false) @RequestPart file: MultipartFile?,
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Any> {
 
+        val existsUser = userService.existUser(username)
+
+        if (!existsUser) {
+            return ResponseEntity.badRequest()
+                .body(mapOf("message" to "User doesn't exist"))
+        }
+
         val userInfoResponse = userService.changeUserInfo(username, password, birthday, bio, file)
 
-        if (userInfoResponse.statusCode != ResponseEntity.ok(mapOf("message" to "User updated successfully"))) {
+        if (!userInfoResponse.statusCode.is2xxSuccessful) {
             return userInfoResponse
         }
         // если всё ок, то достанем userInfo из response

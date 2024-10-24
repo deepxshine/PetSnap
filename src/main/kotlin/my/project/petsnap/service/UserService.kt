@@ -182,12 +182,6 @@ class UserService(
                 .body(mapOf("message" to "Invalid birthday format. Expected format: yyyy-MM-dd"))
         }
 
-        // check if user exists
-        val existingUser = searchUser(username)
-        if (existingUser != null) {
-            return ResponseEntity.badRequest().body(mapOf("message" to "This user already exists"))
-        }
-
         // check if file is an image
         if (file != null && !imageUtils.isImageFile(file)) {
             return ResponseEntity.badRequest().body(mapOf("message" to "Uploaded file is not an image"))
@@ -209,6 +203,11 @@ class UserService(
             bio = bio
         )
         return ResponseEntity.ok(userInfo)
+    }
+
+    fun existUser (username: String): Boolean {
+        val existingUser = searchUser(username)
+        return existingUser != null
     }
 
 }

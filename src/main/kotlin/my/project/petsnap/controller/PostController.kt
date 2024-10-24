@@ -39,7 +39,7 @@ class PostController(
     @Operation(summary = "Show 5 newest posts on main page")
     fun getAllPosts(
         @Parameter(description = "Page number", required = false) @RequestParam(defaultValue = "0") page: Int,
-        @Parameter(description = "Page size", required = false) @RequestParam(defaultValue = "5") size: Int,
+        @Parameter(description = "Page size", required = false) @RequestParam(defaultValue = "10") size: Int,
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Page<PostsOnMainPageResponseDTO>> {
         val posts = postService.getAllPosts(page, size, userId)
