@@ -44,7 +44,7 @@ class HomeAdapter (
 
                 Glide.with(itemView.context)
                     .load(post.user.avatar)
-                    .error(R.drawable.baseline_sentiment_very_satisfied_24)
+                    .error(R.mipmap.ic_launcher)
                     .into(postAvatar)
 
                 postUsername.text = post.user.username

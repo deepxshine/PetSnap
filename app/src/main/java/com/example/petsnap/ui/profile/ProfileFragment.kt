@@ -70,7 +70,7 @@ class ProfileFragment : Fragment() {
             Glide.with(this@ProfileFragment)
                 .load(user.avatar)
                 .placeholder(R.drawable.ic_launcher_foreground) // Placeholder для загрузки
-                .error(R.drawable.baseline_sentiment_very_satisfied_24) // Изображение на случай ошибки
+                .error(R.mipmap.ic_launcher) // Изображение на случай ошибки
                 .into(binding.avatarImageView)
         }
 
