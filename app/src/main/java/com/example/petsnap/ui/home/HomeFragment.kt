@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.petsnap.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -27,8 +28,8 @@ class HomeFragment : Fragment() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
-    private val homeAdapter by lazy {
-        HomeAdapter()
+        private val homeAdapter by lazy {
+        HomeAdapter(viewModel)
     }
 
     override fun onCreateView(
@@ -62,19 +63,22 @@ class HomeFragment : Fragment() {
     private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
+                viewModel.uiState.collectLatest { state ->
                     when (state) {
                         is HomeScreenState.Error -> {
                             Toast.makeText(requireContext(), state.msg, Toast.LENGTH_LONG).show()
                         }
+
                         HomeScreenState.Initial -> {}
-                        HomeScreenState.Loading -> {
+                        HomeScreenState.Loading() -> {
                             loadingStateView()
                         }
+
                         is HomeScreenState.Success -> {
                             successStateView()
                             homeAdapter.submitData(state.posts)
                         }
+                        else -> {}
                     }
                 }
             }
@@ -90,15 +94,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadPosts() {
-        val sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val userId = sharedPreferences.getLong("user_id", -1L)
 
         if (userId == -1L) {
             Toast.makeText(requireContext(), "User ID not found", Toast.LENGTH_SHORT).show()
             return
         } else {
-
-              viewModel.loadPosts(userId)
+            viewModel.loadPosts(userId)
         }
     }
 

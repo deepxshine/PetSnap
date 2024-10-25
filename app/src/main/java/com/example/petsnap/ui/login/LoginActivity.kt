@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.auth0.android.jwt.JWT
 import com.example.petsnap.databinding.ActivityLoginBinding
 import com.example.petsnap.ui.MainActivity
 import com.example.petsnap.ui.register.RegisterActivity
@@ -34,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.loginPassword.text.toString()
 
             viewModel.login(username, password)
+
         }
 
         binding.registerButton.setOnClickListener {
