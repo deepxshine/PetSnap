@@ -2,8 +2,6 @@ package my.project.petsnap.service
 
 import jakarta.persistence.EntityNotFoundException
 import my.project.petsnap.dto.LikeResponseDTO
-import my.project.petsnap.dto.PostDTO
-import my.project.petsnap.dto.UserSearchResponseDTO
 import my.project.petsnap.entity.LikeDB
 import my.project.petsnap.repository.LikeRepository
 import my.project.petsnap.repository.PostRepository
@@ -20,60 +18,35 @@ class LikeService(
 
     ) {
     @Transactional
-    fun addLike(postId: Long, userId: Long): ResponseEntity<Any> {
+    fun addOrRemoveLike(postId: Long, userId: Long): ResponseEntity<Any> {
 
         val user = userRepository.findById(userId).orElseThrow { EntityNotFoundException("User not found") }
         val post = postRepository.findById(postId).orElseThrow { EntityNotFoundException("Post not found") }
 
-        if (likeRepository.existsByUserAndPost(user, post)) {
-            return ResponseEntity.badRequest().body("User has already liked this post")
-        }
-
-        val like = LikeDB(user = user, post = post)
-
-        likeRepository.save(like)
+        val likedByUser = likeRepository.existsByUserAndPost(user, post)
 
         val likeResponse = LikeResponseDTO(
-            id = like.id!!,
-            user = UserSearchResponseDTO(
-                id = like.user.id!!,
-                username = like.user.username,
-                avatar = like.user.avatar,
-            ),
-            post = PostDTO(
-                id = like.post.id!!,
-                image = like.post.image,
-                text = like.post.text,
-            )
+            likesCount = post.likes.count()
         )
-        return ResponseEntity.ok(mapOf("message" to "Liked successfully", "like" to likeResponse))
-    }
 
-    @Transactional
-    fun removeLike(postId: Long, userId: Long) : ResponseEntity<Any> {
-        val user = userRepository.findById(userId).orElseThrow { EntityNotFoundException("User not found") }
-        val post = postRepository.findById(postId).orElseThrow { EntityNotFoundException("Post not found") }
+        if (likedByUser) {
+            // remove like
+            val like = likeRepository.findByUserAndPost(user, post)
+            user.likes.remove(like)  // удалить лайк в userDB
+            post.likes.remove(like) // удалить лайк в postDB
+            likeRepository.delete(like) // удалить likeDB
+            likeResponse.likesCount--
 
-        val like = likeRepository.findByUserAndPost(user, post)
-        if (like == null) {
-            return ResponseEntity.badRequest().body("User has not liked this post")
         } else {
-            val likeRemoveResponse = LikeResponseDTO(
-                id = like.id!!,
-                user = UserSearchResponseDTO(
-                    id = like.user.id!!,
-                    username = like.user.username,
-                    avatar = like.user.avatar,
-                ),
-                post = PostDTO(
-                    id = like.post.id!!,
-                    image = like.post.image,
-                    text = like.post.text,
-                )
-            )
-            likeRepository.delete(like)
-            return ResponseEntity.ok(mapOf("message" to "Removed like", "Removed" to likeRemoveResponse))
+            // add like
+            val like = LikeDB(user = user, post = post)
+            likeRepository.save(like)
+            likeResponse.likesCount++
         }
+
+        return ResponseEntity.ok(likeResponse)
+
+
     }
 
 }

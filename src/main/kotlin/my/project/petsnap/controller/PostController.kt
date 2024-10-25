@@ -46,20 +46,14 @@ class PostController(
         return ResponseEntity.ok(posts)
     }
 
-    @PutMapping("/addLike/{postId}/{userId}")
+    @PutMapping("/like/{postId}/{userId}")
     @Operation(summary = "like a post")
     fun addLike(
         @Parameter(description = "POST Id", required = true) @PathVariable postId: Long,
         @Parameter(description = "USER Id", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Any> {
-        return likeService.addLike(postId, userId)
+        val response = likeService.addOrRemoveLike(postId, userId)
+        return response
     }
 
-    @DeleteMapping("/removeLike/{postId}/{userId}")
-    fun removeLike(
-        @Parameter(description = "POST Id", required = true) @PathVariable postId: Long,
-        @Parameter(description = "USER Id", required = true) @PathVariable userId: Long,
-    ): ResponseEntity<Any> {
-        return likeService.removeLike(postId, userId)
-    }
 }

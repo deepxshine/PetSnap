@@ -11,6 +11,5 @@ interface LikeRepository: JpaRepository<LikeDB, Long> {
 
     fun existsByUserAndPost(user: UserDB, post: PostDB): Boolean
 
-    fun findByUserAndPost(user: UserDB, post: PostDB): LikeDB?
-
+    fun findByUserAndPost(user: UserDB, post: PostDB): LikeDB
 }
