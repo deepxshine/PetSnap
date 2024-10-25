@@ -28,4 +28,9 @@ data class UserDB(
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var comments: MutableList<CommentDB> = mutableListOf(),
 
-    )
+    ) {
+
+    override fun toString(): String {
+        return "UserDB(id=$id, username=$username, password=$password, birthday=$birthday, avatar=$avatar, bio=$bio)"
+    }
+}

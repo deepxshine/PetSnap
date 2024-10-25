@@ -39,27 +39,21 @@ class PostController(
     @Operation(summary = "Show 5 newest posts on main page")
     fun getAllPosts(
         @Parameter(description = "Page number", required = false) @RequestParam(defaultValue = "0") page: Int,
-        @Parameter(description = "Page size", required = false) @RequestParam(defaultValue = "5") size: Int,
+        @Parameter(description = "Page size", required = false) @RequestParam(defaultValue = "10") size: Int,
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Page<PostsOnMainPageResponseDTO>> {
         val posts = postService.getAllPosts(page, size, userId)
         return ResponseEntity.ok(posts)
     }
 
-    @PutMapping("/addLike/{postId}/{userId}")
+    @PutMapping("/like/{postId}/{userId}")
     @Operation(summary = "like a post")
     fun addLike(
         @Parameter(description = "POST Id", required = true) @PathVariable postId: Long,
         @Parameter(description = "USER Id", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Any> {
-        return likeService.addLike(postId, userId)
+        val response = likeService.addOrRemoveLike(postId, userId)
+        return response
     }
 
-    @DeleteMapping("/removeLike/{postId}/{userId}")
-    fun removeLike(
-        @Parameter(description = "POST Id", required = true) @PathVariable postId: Long,
-        @Parameter(description = "USER Id", required = true) @PathVariable userId: Long,
-    ): ResponseEntity<Any> {
-        return likeService.removeLike(postId, userId)
-    }
 }
