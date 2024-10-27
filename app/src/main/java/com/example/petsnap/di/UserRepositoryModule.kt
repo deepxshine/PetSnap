@@ -2,7 +2,7 @@ package com.example.petsnap.di
 
 import com.example.petsnap.data.remote.LoginService
 import com.example.petsnap.data.remote.RegisterService
-import com.example.petsnap.data.remote.UserService
+import com.example.petsnap.data.remote.UserProfileService
 import com.example.petsnap.data.repository.LoginRepositoryImpl
 import com.example.petsnap.data.repository.RegisterRepositoryImpl
 import com.example.petsnap.data.repository.UserProfileRepositoryImpl
@@ -27,8 +27,8 @@ object UserRepositoryModule {
 
     @Provides
     @Singleton
-    fun provideUserProfileRepository(userService: UserService): UserProfileRepository {
-        return UserProfileRepositoryImpl(userService)
+    fun provideUserProfileRepository(userProfileService: UserProfileService): UserProfileRepository {
+        return UserProfileRepositoryImpl(userProfileService)
     }
 
     @Provides
