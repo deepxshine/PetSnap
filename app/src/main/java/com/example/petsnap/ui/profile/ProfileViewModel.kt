@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.petsnap.domain.model.PostOnProfile
 import com.example.petsnap.domain.model.UserProfile
 import com.example.petsnap.domain.repository.UserProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,18 +21,56 @@ class ProfileViewModel @Inject constructor(
     private val _userProfile = MutableLiveData<UserProfile>()
     val userProfile: LiveData<UserProfile> = _userProfile
 
+    private val _posts = MutableLiveData<List<PostOnProfile>>()
+    val posts: LiveData<List<PostOnProfile>> = _posts
+
+    private var currentPage = 0
+    val pageSize = 9
+    var isLoading = false
+    var isLastPage = false
+
+    var userId: Long = -1L
+
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
 
     fun loadUserProfile(userId: Long) {
+        this.userId = userId
+        currentPage = 0 // Сбрасываем текущую страницу
+        isLastPage = false // Сбрасываем флаг последней страницы
         viewModelScope.launch {
             try {
-                // Попытка загрузить профиль пользователя
-                val userProfile = userProfileRepository.getUserProfile(userId)
+                val userProfile = userProfileRepository.getUserProfile(userId, page = currentPage, size = pageSize)
                 _userProfile.value = userProfile
+                _posts.value = userProfile.posts // Устанавливаем начальные посты
             } catch (e: Exception) {
-                // Ловим любую ошибку и передаем её в LiveData
                 _error.value = handleError(e)
+            }
+        }
+    }
+
+    fun loadMorePosts() {
+        if (isLoading || isLastPage) return // Условие, если загрузка идет или последняя страница
+
+        isLoading = true
+        viewModelScope.launch {
+            try {
+                currentPage++
+                val additionalProfileData = userProfileRepository.getUserProfile(userId, page = currentPage, size = pageSize)
+
+                val currentPosts = _posts.value.orEmpty()
+                _posts.value = currentPosts + additionalProfileData.posts
+
+                // Проверяем, есть ли посты, которые мы загрузили
+                if (additionalProfileData.posts.isEmpty()) {
+                    isLastPage = true // Устанавливаем флаг, если нет постов
+                } else if (additionalProfileData.posts.size < pageSize) {
+                    isLastPage = true // Если загруженные посты меньше размера страницы, устанавливаем флаг
+                }
+            } catch (e: Exception) {
+                _error.value = handleError(e)
+            } finally {
+                isLoading = false // Сбрасываем состояние загрузки
             }
         }
     }

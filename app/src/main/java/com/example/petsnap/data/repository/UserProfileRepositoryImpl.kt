@@ -9,7 +9,7 @@ class UserProfileRepositoryImpl @Inject constructor(
     private val userProfileService: UserProfileService
 ) : UserProfileRepository {
 
-    override suspend fun getUserProfile(userId: Long): UserProfile {
-        return userProfileService.getUserProfile(userId)
+    override suspend fun getUserProfile(userId: Long, page: Int, size: Int): UserProfile {
+        return userProfileService.getUserProfile(userId, page, size)
     }
 }
