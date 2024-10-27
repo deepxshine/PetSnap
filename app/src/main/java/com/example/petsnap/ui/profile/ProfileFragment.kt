@@ -1,5 +1,6 @@
 package com.example.petsnap.ui.profile
 
+import PostsAdapter
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,11 +9,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.petsnap.R
 import com.example.petsnap.databinding.FragmentProfileBinding
-import com.example.petsnap.domain.model.User
+import com.example.petsnap.domain.model.UserProfile
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,6 +25,7 @@ class ProfileFragment : Fragment() {
         get() = _binding ?: throw IllegalStateException("FragmentProfileBinding is not initialized")
 
     private val viewModel: ProfileViewModel by viewModels()
+    private lateinit var postsAdapter: PostsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,48 +38,98 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupRecyclerView()
+        setupObservers()
+
         val sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val userId = sharedPreferences.getLong("user_id", -1L)
 
-        if (userId == -1L) {
-            Toast.makeText(requireContext(), "User ID not found", Toast.LENGTH_SHORT).show()
-            return
+        if (userId != -1L) {
+            viewModel.loadUserProfile(userId) // Загружаем профиль пользователя
         } else {
-            // Загружаем профиль пользователя
+            Toast.makeText(requireContext(), "User ID not found", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.recyclerViewPosts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as GridLayoutManager
+                val visibleItemCount = layoutManager.childCount
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                // Условия для загрузки следующих постов
+                if (!viewModel.isLoading && !viewModel.isLastPage) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 1 && // изменено на totalItemCount - 1
+                        firstVisibleItemPosition >= 0 &&
+                        totalItemCount >= viewModel.pageSize
+                    ) {
+                        viewModel.loadMorePosts()  // Загружаем следующую страницу
+                    }
+                }
+            }
+        })
+    }
+
+    private fun setupRecyclerView() {
+        postsAdapter = PostsAdapter(listOf())
+        binding.recyclerViewPosts.apply {
+            layoutManager = GridLayoutManager(context, 3)
+            adapter = postsAdapter
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.userProfile.observe(viewLifecycleOwner) { userProfile ->
+            userProfile?.let { updateUserUI(it) }
+        }
+
+        viewModel.posts.observe(viewLifecycleOwner) { posts ->
+            posts?.let {
+                postsAdapter.updatePosts(it)
+            }
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun loadUserProfile() {
+        val sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val userId = sharedPreferences.getLong("user_id", -1L)
+
+        if (userId != -1L) {
             viewModel.loadUserProfile(userId)
+        } else {
+            Toast.makeText(requireContext(), "User ID not found", Toast.LENGTH_SHORT).show()
         }
+    }
 
-        // Подписка на данные пользователя
-        viewModel.user.observe(viewLifecycleOwner, Observer { user ->
-            user?.let {
-                updateUserUI(it)
-            }
-        })
-        // Подписка на ошибки
-        viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
-            if (errorMessage != null) {
-                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
-            }
-        })
-        }
+    override fun onResume() {
+        super.onResume()
+        loadUserProfile() // Перезагрузка профиля при возврате на фрагмент
+    }
 
-        // Функция для обновления UI с данными пользователя
-        private fun updateUserUI(user: User) {
-            // Используем binding для доступа к элементам UI
-            binding.usernameTextView.text = user.username
-            binding.bioTextView.text = user.bio ?: "No bio available"
+    private fun updateUserUI(userProfile: UserProfile) {
+        binding.usernameTextView.text = userProfile.username
+        binding.bioTextView.text = userProfile.bio ?: "No bio available"
 
-            // Загрузка аватара с помощью Glide
-            Glide.with(this@ProfileFragment)
-                .load(user.avatar)
-                .placeholder(R.drawable.ic_launcher_foreground) // Placeholder для загрузки
-                .error(R.mipmap.ic_launcher) // Изображение на случай ошибки
-                .into(binding.avatarImageView)
-        }
+        // Загрузка аватара с помощью Glide
+        Glide.with(this@ProfileFragment)
+            .load(userProfile.avatar)
+            .placeholder(R.drawable.ic_launcher_foreground)
+            .error(R.mipmap.ic_launcher)
+            .into(binding.avatarImageView)
 
-        // Освобождаем binding, чтобы избежать утечек памяти
-        override fun onDestroyView() {
-            super.onDestroyView()
-            _binding = null
-        }
+        // Обновляем список постов в адаптере
+        postsAdapter.updatePosts(userProfile.posts)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
