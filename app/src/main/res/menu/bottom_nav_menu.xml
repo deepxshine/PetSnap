@@ -12,9 +12,14 @@
         android:title="@string/title_search" />
 
     <item
+        android:id="@+id/navigation_create"
+        android:icon="@drawable/baseline_add_circle_outline_24"
+        android:title="+" />
+
+    <item
         android:id="@+id/navigation_friends"
         android:icon="@drawable/baseline_people_24"
-        android:title="@string/title_search" />
+        android:title="@string/title_friends" />
 
     <item
         android:id="@+id/navigation_profile"

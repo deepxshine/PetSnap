@@ -54,9 +54,6 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = homeAdapter
 
-            // TODO: homeAdapter.createPostClickListener
-            // TODO: homeAdapter.likeClickListener
-            // TODO: homeAdapter.commentClickListener
         }
     }
 
