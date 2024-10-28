@@ -18,10 +18,16 @@
         tools:layout="@layout/fragment_search" />
 
     <fragment
+        android:id="@+id/navigation_create"
+        android:name="com.example.petsnap.ui.create.CreateFragment"
+        android:label="@string/title_search"
+        tools:layout="@layout/fragment_create" />
+
+    <fragment
         android:id="@+id/navigation_friends"
         android:name="com.example.petsnap.ui.friends.FriendsFragment"
         android:label="@string/title_friends"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_friends" />
 
     <fragment
         android:id="@+id/navigation_profile"

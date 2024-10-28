@@ -70,7 +70,7 @@ class HomeViewModel @Inject constructor(
             val currentState = _uiState.value
 
             if (currentState is HomeScreenState.Success) {
-                // 在 PagingData 上应用 map 转换
+                // обновляем post
                 val updatedPosts = currentState.posts.map { post ->
                     Log.d("ViewModel", "Processing post: $post")
                     if (post.id == postId) {

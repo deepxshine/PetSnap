@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.petsnap.databinding.ActivityRegisterBinding
 import com.example.petsnap.ui.login.LoginActivity
 import com.example.petsnap.utils.Status
+import com.example.petsnap.utils.FileUtils
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
@@ -28,7 +29,7 @@ class RegisterActivity : AppCompatActivity() {
     private val filePickerLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                selectedFile = createTempFileFromUri(it)
+                selectedFile = FileUtils.createTempFileFromUri(this.contentResolver, it)
                 binding.regAvatar.setImageURI(uri)
             }
         }
@@ -60,15 +61,20 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+//            if (file != null) {
+//                if (file.length() > 10 * 1024 * 1024) { // если фото больше 10mb
+//                    Toast.makeText(
+//                        this,
+//                        "File size exceeds the limit (10MB)",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//            }
+
             if (file != null) {
-                if (file.length() > 10 * 1024 * 1024) { // если фото больше 10mb
-                    Toast.makeText(
-                        this,
-                        "File size exceeds the limit (10MB)",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                FileUtils.fileSizeLimit(this, file)
             }
+
 
             viewModel.registerUser(username, password, birthday, bio, file)
         }
@@ -89,7 +95,6 @@ class RegisterActivity : AppCompatActivity() {
                 }
 
                 Status.LOADING -> {
-                    print("")
                 }
             }
         }
@@ -100,21 +105,21 @@ class RegisterActivity : AppCompatActivity() {
         _binding = null
     }
 
-    private fun createTempFileFromUri(uri: Uri): File? {
-        return try {
-            val inputStream = contentResolver.openInputStream(uri)
-            val tempFile = File.createTempFile("temp_image", ".jpg")
-            inputStream?.use { input ->
-                tempFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-            tempFile
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
+//    private fun createTempFileFromUri(uri: Uri): File? {
+//        return try {
+//            val inputStream = contentResolver.openInputStream(uri)
+//            val tempFile = File.createTempFile("temp_image", ".jpg")
+//            inputStream?.use { input ->
+//                tempFile.outputStream().use { output ->
+//                    input.copyTo(output)
+//                }
+//            }
+//            tempFile
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            null
+//        }
+//    }
 }
 
 

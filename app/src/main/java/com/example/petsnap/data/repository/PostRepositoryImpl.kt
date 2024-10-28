@@ -3,8 +3,10 @@ package com.example.petsnap.data.repository
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.petsnap.data.remote.PostService
+import com.example.petsnap.domain.model.CreatePostRequest
 import com.example.petsnap.domain.model.PostsOnMainPageResponse
 import com.example.petsnap.domain.repository.PostRepository
+import retrofit2.Response
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(private val postService: PostService) : PostRepository {
@@ -33,6 +35,21 @@ class PostRepositoryImpl @Inject constructor(private val postService: PostServic
                 }
             }
         }
+    }
+
+    override suspend fun createPost(
+        createPostRequest: CreatePostRequest
+    ): Response<PostsOnMainPageResponse> {
+        val filePart = createPostRequest.toFilePart()
+        val textPart = createPostRequest.textToPart()
+
+        val response = postService.createPost(
+            filePart,
+            textPart,
+            createPostRequest.userId
+        )
+
+        return response
     }
 
 
