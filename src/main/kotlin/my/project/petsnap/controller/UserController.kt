@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import my.project.petsnap.dto.LoginRequestDTO
 import my.project.petsnap.dto.InputUserInfoRequestDTO
+import my.project.petsnap.dto.UserFollowersAndFollowings
 import my.project.petsnap.service.JwtTokenService
 import my.project.petsnap.service.UserService
 import org.springframework.http.HttpStatus
@@ -170,23 +171,15 @@ class UserController(
         }
     }
 
-    @GetMapping("/{userId}/followers")
-    @Operation(summary = "Get user's followers")
-    fun getFollowers(
+    @GetMapping("/{userId}/friendship")
+    @Operation(summary = "Get user's followers and followings")
+    fun getFriendship(
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Any> {
         val followersList = userService.getFollowers(userId)
-        return ResponseEntity.ok(followersList)
-    }
-
-    @GetMapping("/{userId}/followings")
-    @Operation(summary = "Get user's followings")
-    fun getFollowing(
-        @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
-    ): ResponseEntity<Any> {
         val followingsList = userService.getFollowings(userId)
-        return ResponseEntity.ok(followingsList)
+        val response = UserFollowersAndFollowings(followersList, followingsList)
+        return ResponseEntity.ok(response)
     }
-
 
 }
