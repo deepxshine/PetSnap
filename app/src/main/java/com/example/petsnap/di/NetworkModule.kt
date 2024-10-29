@@ -3,7 +3,7 @@ package com.example.petsnap.di
 import com.example.petsnap.data.remote.LoginService
 import com.example.petsnap.data.remote.PostService
 import com.example.petsnap.data.remote.RegisterService
-import com.example.petsnap.data.remote.UserProfileService
+import com.example.petsnap.data.remote.UserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,8 +41,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideUserService(retrofit: Retrofit): UserProfileService {
-        return retrofit.create(UserProfileService::class.java)
+    fun provideUserService(retrofit: Retrofit): UserService {
+        return retrofit.create(UserService::class.java)
     }
 
     @Provides

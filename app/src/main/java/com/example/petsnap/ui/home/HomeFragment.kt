@@ -28,7 +28,7 @@ class HomeFragment : Fragment() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
-        private val homeAdapter by lazy {
+    private val homeAdapter by lazy {
         HomeAdapter(viewModel)
     }
 
@@ -66,8 +66,8 @@ class HomeFragment : Fragment() {
                             Toast.makeText(requireContext(), state.msg, Toast.LENGTH_LONG).show()
                         }
 
-                        HomeScreenState.Initial -> {}
-                        HomeScreenState.Loading() -> {
+                        is HomeScreenState.Initial -> {}
+                        is HomeScreenState.Loading -> {
                             loadingStateView()
                         }
 
@@ -75,7 +75,6 @@ class HomeFragment : Fragment() {
                             successStateView()
                             homeAdapter.submitData(state.posts)
                         }
-                        else -> {}
                     }
                 }
             }

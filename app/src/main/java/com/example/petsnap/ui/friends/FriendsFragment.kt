@@ -1,38 +1,124 @@
 package com.example.petsnap.ui.friends
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.petsnap.databinding.FragmentFriendsBinding
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class FriendsFragment : Fragment() {
 
     private var _binding: FragmentFriendsBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private val binding: FragmentFriendsBinding
+        get() = _binding ?: throw IllegalStateException("FragmentFriendsBinding is not initialized")
+
+    private val viewModel by viewModels<FriendsViewModel>()
+
+    private val followersAdapter by lazy {
+        FollowersAdapter(viewModel)
+    }
+
+    private val followingsAdapter by lazy {
+        FollowingsAdapter(viewModel)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val friendsViewModel =
-            ViewModelProvider(this).get(FriendsViewModel::class.java)
+        _binding = FragmentFriendsBinding.inflate(layoutInflater, container, false)
+        return  binding.root
+    }
 
-        _binding = FragmentFriendsBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val textView: TextView = binding.textFriends
-        friendsViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        setUpRV()
+
+        binding.followerButton.setOnClickListener {
+            binding.rvFragmentFriends.adapter = followersAdapter
+            viewModel.uiState.value.let { state ->
+                if (state is FriendsScreenState.Success) {
+                    followersAdapter.submitList(state.followersList)
+                }
+            }
         }
-        return root
+
+        binding.followingButton.setOnClickListener {
+            binding.rvFragmentFriends.adapter = followingsAdapter
+            viewModel.uiState.value.let { state ->
+                if (state is FriendsScreenState.Success) {
+                    followingsAdapter.submitList(state.followingsList)
+                }
+            }
+        }
+
+
+        observeUiState()
+        loadFriendship()
+    }
+
+    private fun setUpRV() {
+        binding.rvFragmentFriends.apply {
+            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+            adapter = followersAdapter // показать followersAdapter по умолчанию
+
+        }
+    }
+
+    private fun observeUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    when(state) {
+                        is FriendsScreenState.Error -> {
+                            Toast.makeText(requireContext(), state.msg, Toast.LENGTH_LONG).show()
+                        }
+                        is FriendsScreenState.Initial -> {}
+                        is FriendsScreenState.Loading -> {
+                            loadingStateView()
+                        }
+                        is FriendsScreenState.Success -> {
+                            successStateView()
+                            println("${state.followersList}")
+                             followersAdapter.submitList(state.followersList) // показать followersList по умолчанию
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadFriendship() {
+        val sharedPreferences =
+            requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val userId = sharedPreferences.getLong("user_id", -1L)
+
+        viewModel.loadFriendship(userId)
+
+    }
+
+    private fun loadingStateView() {
+        binding.pbHome.visibility = View.VISIBLE
+    }
+
+    private fun successStateView() {
+        binding.pbHome.visibility = View.GONE
     }
 
     override fun onDestroyView() {

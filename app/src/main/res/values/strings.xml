@@ -24,4 +24,6 @@
     <string name="take_photos">Take photos</string>
     <string name="select_from_album">Select From Album</string>
     <string name="cancel">Cancel</string>
+    <string name="follow">Follow</string>
+    <string name="following">Following</string>
 </resources>

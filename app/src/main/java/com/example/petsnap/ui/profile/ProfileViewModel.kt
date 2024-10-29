@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.petsnap.domain.model.PostOnProfile
 import com.example.petsnap.domain.model.UserProfile
-import com.example.petsnap.domain.repository.UserProfileRepository
+import com.example.petsnap.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val userProfileRepository: UserProfileRepository
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _userProfile = MutableLiveData<UserProfile>()
@@ -40,7 +40,7 @@ class ProfileViewModel @Inject constructor(
         isLastPage = false // Сбрасываем флаг последней страницы
         viewModelScope.launch {
             try {
-                val userProfile = userProfileRepository.getUserProfile(userId, page = currentPage, size = pageSize)
+                val userProfile = userRepository.getUserProfile(userId, page = currentPage, size = pageSize)
                 _userProfile.value = userProfile
                 _posts.value = userProfile.posts // Устанавливаем начальные посты
             } catch (e: Exception) {
@@ -56,7 +56,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 currentPage++
-                val additionalProfileData = userProfileRepository.getUserProfile(userId, page = currentPage, size = pageSize)
+                val additionalProfileData = userRepository.getUserProfile(userId, page = currentPage, size = pageSize)
 
                 val currentPosts = _posts.value.orEmpty()
                 _posts.value = currentPosts + additionalProfileData.posts

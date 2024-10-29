@@ -75,7 +75,6 @@ class HomeAdapter (
 
                 commentsCount.text = post.commentsCount.toString()
 
-
             }
 
         }
