@@ -2,13 +2,13 @@ package com.example.petsnap.di
 
 import com.example.petsnap.data.remote.LoginService
 import com.example.petsnap.data.remote.RegisterService
-import com.example.petsnap.data.remote.UserProfileService
+import com.example.petsnap.data.remote.UserService
 import com.example.petsnap.data.repository.LoginRepositoryImpl
 import com.example.petsnap.data.repository.RegisterRepositoryImpl
-import com.example.petsnap.data.repository.UserProfileRepositoryImpl
+import com.example.petsnap.data.repository.UserRepositoryImpl
 import com.example.petsnap.domain.repository.LoginRepository
 import com.example.petsnap.domain.repository.RegisterRepository
-import com.example.petsnap.domain.repository.UserProfileRepository
+import com.example.petsnap.domain.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,14 +21,14 @@ object UserRepositoryModule {
 
     @Provides
     @Singleton
-    fun provideUserRegisterRepository(registerService: RegisterService) : RegisterRepository {
+    fun provideRegisterRepository(registerService: RegisterService) : RegisterRepository {
         return RegisterRepositoryImpl(registerService)
     }
 
     @Provides
     @Singleton
-    fun provideUserProfileRepository(userProfileService: UserProfileService): UserProfileRepository {
-        return UserProfileRepositoryImpl(userProfileService)
+    fun provideUserRepository(userService: UserService): UserRepository {
+        return UserRepositoryImpl(userService)
     }
 
     @Provides

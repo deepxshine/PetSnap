@@ -61,16 +61,6 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-//            if (file != null) {
-//                if (file.length() > 10 * 1024 * 1024) { // если фото больше 10mb
-//                    Toast.makeText(
-//                        this,
-//                        "File size exceeds the limit (10MB)",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//            }
-
             if (file != null) {
                 FileUtils.fileSizeLimit(this, file)
             }
@@ -105,21 +95,6 @@ class RegisterActivity : AppCompatActivity() {
         _binding = null
     }
 
-//    private fun createTempFileFromUri(uri: Uri): File? {
-//        return try {
-//            val inputStream = contentResolver.openInputStream(uri)
-//            val tempFile = File.createTempFile("temp_image", ".jpg")
-//            inputStream?.use { input ->
-//                tempFile.outputStream().use { output ->
-//                    input.copyTo(output)
-//                }
-//            }
-//            tempFile
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            null
-//        }
-//    }
 }
 
 
