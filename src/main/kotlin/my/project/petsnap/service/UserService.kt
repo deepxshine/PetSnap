@@ -144,11 +144,16 @@ class UserService(
     fun getFollowers(followingId: Long): List<FollowDTO> {
         val friendships = friendshipRepository.findByFollowingId(followingId)
         val followers = friendships.map { it.follower }
+
         val followersList = followers.map { follower ->
+            val followed = friendshipRepository.findByFollowerIdAndFollowingId(follower.id!!, followingId)
+            val followedByUser: Boolean = followed != null
+
             FollowDTO(
                 id = follower.id!!,
                 username = follower.username,
-                avatar = follower.avatar
+                avatar = follower.avatar,
+                followedByUser = followedByUser,
             )
         }
         return followersList
@@ -161,7 +166,8 @@ class UserService(
             FollowDTO(
                 id = following.id!!,
                 username = following.username,
-                avatar = following.avatar
+                avatar = following.avatar,
+                followedByUser = true,
             )
         }
         return followingsList
