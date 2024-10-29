@@ -26,7 +26,8 @@ class PostController(
         @Parameter(description = "text", required = false) @RequestParam text: String?,
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
     ): ResponseEntity<Any> {
-        return postService.createPost(file, text, userId)
+        val response = postService.createPost(file, text, userId)
+        return response
     }
 
     @DeleteMapping("/deletePost/{postId}")

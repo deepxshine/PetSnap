@@ -1,6 +1,5 @@
 package my.project.petsnap.service
 
-import my.project.petsnap.dto.PostResponseDTO
 import my.project.petsnap.dto.PostsOnMainPageResponseDTO
 import my.project.petsnap.dto.UserSearchResponseDTO
 import my.project.petsnap.entity.PostDB
@@ -51,10 +50,15 @@ class PostService(
 
             postRepository.save(post)
 
-            val createdPost = PostResponseDTO(
+            val createdPost = PostsOnMainPageResponseDTO(
                 id = post.id!!,
                 image = post.image,
                 text = post.text,
+                user = UserSearchResponseDTO(
+                    id = post.user.id!!,
+                    username = post.user.username,
+                    avatar = post.user.avatar,
+                ),
                 postTime = post.postTime,
                 commentsCount = post.comments.count(),
                 likesCount = post.likes.count(),
