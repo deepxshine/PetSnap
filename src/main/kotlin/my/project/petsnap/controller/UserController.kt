@@ -137,8 +137,8 @@ class UserController(
                 ResponseEntity.badRequest().body(mapOf("error" to "You can not follow yourself"))
             } else {
                 val result = userService.followUser(followerId, followingId)
-                if (result) {
-                    ResponseEntity.ok(mapOf("message" to "User followed successfully"))
+                if (result != null) {
+                    ResponseEntity.ok(result)
                 } else ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(mapOf("error" to "This user is already in your following list")) // если подписан, то не нужно повторно подписаться
             }
@@ -161,8 +161,8 @@ class UserController(
                     followerId,
                     followingId
                 ) // узнать, подписан ли пользователь на другого пользователя
-                if (result) {
-                    ResponseEntity.ok(mapOf("message" to "User unfollowed successfully"))
+                if (result != null) {
+                    ResponseEntity.ok(result)
                 } else ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(mapOf("error" to "This user is not in your following list")) // если не подписан, то не нужно отписаться
             }

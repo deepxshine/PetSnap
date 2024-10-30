@@ -115,29 +115,50 @@ class UserService(
     }
 
 
-    fun followUser(followerId: Long, followingId: Long): Boolean {
+    fun followUser(followerId: Long, followingId: Long): FollowDTO? {
         val follower = userRepository.findById(followerId).orElseThrow { RuntimeException("Follower not found") }
         val following =
             userRepository.findById(followingId).orElseThrow { RuntimeException("Following not found") }
 
         // Если не подписан, то follower подписывается на following
         val existingFriendship = friendshipRepository.findByFollowerIdAndFollowingId(followerId, followingId)
-        if (existingFriendship == null) {
+        return if (existingFriendship == null) {
             val friendship = FriendshipDB(follower = follower, following = following)
             friendshipRepository.save(friendship)
-            return true
+
+            // вернуть данные подписанного
+             FollowDTO(
+                id = following.id!!,
+                username = following.username,
+                avatar = following.avatar,
+                followedByUser = true
+            )
+
         } else {
-            return false
+            null
         }
     }
 
-    fun unfollowUser(followerId: Long, followingId: Long): Boolean {
+    fun unfollowUser(followerId: Long, followingId: Long): FollowDTO? {
+
+        val following =
+            userRepository.findById(followingId).orElseThrow { RuntimeException("Following not found") }
+
         val existingFriendship = friendshipRepository.findByFollowerIdAndFollowingId(followerId, followingId)
-        if (existingFriendship != null) {
+
+        return if (existingFriendship != null) {
             friendshipRepository.delete(existingFriendship)
-            return true
+
+            // вернуть данные удаленного подписанного
+            FollowDTO(
+                id = following.id!!,
+                username = following.username,
+                avatar = following.avatar,
+                followedByUser = false
+            )
+
         } else {
-            return false
+            null
         }
     }
 
@@ -146,7 +167,8 @@ class UserService(
         val followers = friendships.map { it.follower }
 
         val followersList = followers.map { follower ->
-            val followed = friendshipRepository.findByFollowerIdAndFollowingId(follower.id!!, followingId)
+            val followed = friendshipRepository.findByFollowerIdAndFollowingId(followingId, follower.id!!)
+
             val followedByUser: Boolean = followed != null
 
             FollowDTO(
