@@ -1,6 +1,7 @@
 package com.example.petsnap.domain.repository
 
 import com.example.petsnap.domain.model.RegisterResponse
+import com.example.petsnap.utils.Resource
 import retrofit2.Response
 import java.io.File
 
@@ -11,5 +12,5 @@ interface RegisterRepository {
         birthday: String?,
         bio: String?,
         file: File?
-    ): Response<RegisterResponse>
+    ): Resource<RegisterResponse>
 }

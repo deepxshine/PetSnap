@@ -6,10 +6,12 @@ import com.example.petsnap.data.remote.PostService
 import com.example.petsnap.domain.model.CreatePostRequest
 import com.example.petsnap.domain.model.PostsOnMainPageResponse
 import com.example.petsnap.domain.repository.PostRepository
+import com.example.petsnap.utils.Resource
 import retrofit2.Response
 import javax.inject.Inject
 
-class PostRepositoryImpl @Inject constructor(private val postService: PostService) : PostRepository {
+class PostRepositoryImpl @Inject constructor(private val postService: PostService) :
+    PostRepository {
 
     override fun getPagingSource(userId: Long): PagingSource<Int, PostsOnMainPageResponse> {
         return object : PagingSource<Int, PostsOnMainPageResponse>() {
@@ -39,18 +41,25 @@ class PostRepositoryImpl @Inject constructor(private val postService: PostServic
 
     override suspend fun createPost(
         createPostRequest: CreatePostRequest
-    ): Response<PostsOnMainPageResponse> {
-        val filePart = createPostRequest.toFilePart()
-        val textPart = createPostRequest.textToPart()
+    ): Resource<PostsOnMainPageResponse> {
 
-        val response = postService.createPost(
-            filePart,
-            textPart,
-            createPostRequest.userId
-        )
+        return try {
+            val filePart = createPostRequest.toFilePart()
+            val textPart = createPostRequest.textToPart()
 
-        return response
+            val response = postService.createPost(
+                filePart,
+                textPart,
+                createPostRequest.userId
+            )
+
+            if (response.isSuccessful) {
+                Resource.success(response.body())
+            } else {
+                Resource.error(response.message(), null)
+            }
+        } catch (e: Exception) {
+            Resource.error(e.message ?: "Unknown error", null)
+        }
     }
-
-
 }

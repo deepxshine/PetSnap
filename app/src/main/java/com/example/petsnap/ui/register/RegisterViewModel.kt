@@ -23,17 +23,8 @@ class RegisterViewModel @Inject constructor(
     fun registerUser(username: String, password: String, birthday: String?, bio: String?, file: File?) {
         viewModelScope.launch {
             _registerResult.value = Resource.loading(null)
-            try {
-                val response = registerUseCase(username, password, birthday, bio, file)
-
-                if (response.isSuccessful) {
-                    _registerResult.value = Resource.success(response.body())
-                } else {
-                    _registerResult.value = Resource.error(response.message(), null)
-                }
-            } catch (e: Exception) {
-                _registerResult.value = Resource.error(e.message ?: "Unknown error", null)
-            }
+            val result = registerUseCase(username, password, birthday, bio, file)
+            _registerResult.value = result
         }
     }
 }
