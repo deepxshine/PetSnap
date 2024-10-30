@@ -66,7 +66,7 @@ class HomeViewModel @Inject constructor(
     fun addOrRemoveLike(postId: Long, userId: Long) {
         viewModelScope.launch {
             val likeRequest = LikeRequest(postId, userId)
-            val response = addOrRemoveLikeUseCase(likeRequest)
+            val likeResult = addOrRemoveLikeUseCase(likeRequest)
             val currentState = _uiState.value
 
             if (currentState is HomeScreenState.Success) {
@@ -74,7 +74,7 @@ class HomeViewModel @Inject constructor(
                 val updatedPosts = currentState.posts.map { post ->
                     Log.d("ViewModel", "Processing post: $post")
                     if (post.id == postId) {
-                        response.data?.let {
+                        likeResult.data?.let {
                             post.copy(
                                 likesCount = it.likesCount,
                                 likedByUser = !post.likedByUser
@@ -88,7 +88,7 @@ class HomeViewModel @Inject constructor(
                 // обновлять uiState
                 _uiState.value = HomeScreenState.Success(
                     posts = updatedPosts,
-                    likeResult = response
+                    likeResult = likeResult
                 )
             }
         }

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.petsnap.databinding.FragmentFriendsBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -35,7 +36,6 @@ class FriendsFragment : Fragment() {
         FollowingsAdapter(viewModel)
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,18 +51,24 @@ class FriendsFragment : Fragment() {
         setUpRV()
 
         binding.followerButton.setOnClickListener {
+            println("click")
             binding.rvFragmentFriends.adapter = followersAdapter
             viewModel.uiState.value.let { state ->
+                println("enter")
                 if (state is FriendsScreenState.Success) {
+                    println("${state.followersList}")
                     followersAdapter.submitList(state.followersList)
                 }
             }
         }
 
         binding.followingButton.setOnClickListener {
+            println("click")
             binding.rvFragmentFriends.adapter = followingsAdapter
             viewModel.uiState.value.let { state ->
+                println("enter")
                 if (state is FriendsScreenState.Success) {
+                    println("${state.followingsList}")
                     followingsAdapter.submitList(state.followingsList)
                 }
             }
@@ -84,7 +90,7 @@ class FriendsFragment : Fragment() {
     private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
+                viewModel.uiState.collectLatest { state ->
                     when(state) {
                         is FriendsScreenState.Error -> {
                             Toast.makeText(requireContext(), state.msg, Toast.LENGTH_LONG).show()
@@ -96,7 +102,8 @@ class FriendsFragment : Fragment() {
                         is FriendsScreenState.Success -> {
                             successStateView()
                             println("${state.followersList}")
-                             followersAdapter.submitList(state.followersList) // показать followersList по умолчанию
+                            followersAdapter.submitList(state.followersList) // показать followersList по умолчанию
+                            followingsAdapter.submitList(state.followingsList)
                         }
                     }
                 }
@@ -104,13 +111,16 @@ class FriendsFragment : Fragment() {
         }
     }
 
-    private fun loadFriendship() {
+    private fun getUserId(): Long {
         val sharedPreferences =
             requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val userId = sharedPreferences.getLong("user_id", -1L)
+        return userId
+    }
 
+    private fun loadFriendship() {
+        val userId = getUserId()
         viewModel.loadFriendship(userId)
-
     }
 
     private fun loadingStateView() {
