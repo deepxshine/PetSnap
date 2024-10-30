@@ -7,7 +7,6 @@ import com.example.petsnap.domain.model.CreatePostRequest
 import com.example.petsnap.domain.model.PostsOnMainPageResponse
 import com.example.petsnap.domain.repository.PostRepository
 import com.example.petsnap.utils.Resource
-import retrofit2.Response
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(private val postService: PostService) :

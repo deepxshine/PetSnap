@@ -1,5 +1,6 @@
 package com.example.petsnap.data.remote
 
+import com.example.petsnap.domain.model.FriendshipResponse
 import com.example.petsnap.domain.model.UserFollowersAndFollowings
 import com.example.petsnap.domain.model.UserProfile
 import retrofit2.Response
@@ -25,12 +26,12 @@ interface UserService {
     suspend fun followUser(
         @Path("followerId") followerId: Long,
         @Path("followingId") followingId: Long
-    ): Response<String>
+    ): Response<FriendshipResponse>
 
     @POST("user/unfollow/{followerId}/{followingId}")
     suspend fun unfollowUser(
         @Path("followerId") followerId: Long,
         @Path("followingId") followingId: Long
-    ): Response<String>
+    ): Response<FriendshipResponse>
 }
  

@@ -4,7 +4,6 @@ import androidx.paging.PagingSource
 import com.example.petsnap.domain.model.CreatePostRequest
 import com.example.petsnap.domain.model.PostsOnMainPageResponse
 import com.example.petsnap.utils.Resource
-import retrofit2.Response
 
 interface PostRepository {
 

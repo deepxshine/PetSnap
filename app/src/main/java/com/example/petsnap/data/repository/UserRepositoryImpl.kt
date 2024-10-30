@@ -1,6 +1,8 @@
 package com.example.petsnap.data.repository
 
 import com.example.petsnap.data.remote.UserService
+import com.example.petsnap.domain.model.FollowAndUnfollowRequest
+import com.example.petsnap.domain.model.FriendshipResponse
 import com.example.petsnap.domain.model.UserFollowersAndFollowings
 import com.example.petsnap.domain.model.UserProfile
 import com.example.petsnap.domain.repository.UserRepository
@@ -30,9 +32,9 @@ class UserRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
     // flowOn(Dispatchers.IO)：指定 Flow 在 Dispatchers.IO 调度器上运行，以确保网络请求在后台线程中执行。
 
-    override suspend fun followUser(followerId: Long, followingId: Long): Resource<String> {
+    override suspend fun followUser(followRequest: FollowAndUnfollowRequest): Resource<FriendshipResponse> {
         return try {
-            val response = userService.followUser(followerId, followingId)
+            val response = userService.followUser(followRequest.followerId, followRequest.followingId)
             if (response.isSuccessful) {
                 Resource.success(response.body())
             } else {
@@ -44,9 +46,9 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun unfollowUser(followerId: Long, followingId: Long): Resource<String> {
+    override suspend fun unfollowUser(unfollowRequest: FollowAndUnfollowRequest): Resource<FriendshipResponse> {
         return try {
-            val response = userService.unfollowUser(followerId, followingId)
+            val response = userService.unfollowUser(unfollowRequest.followerId, unfollowRequest.followingId)
             if (response.isSuccessful) {
                 Resource.success(response.body())
             } else {

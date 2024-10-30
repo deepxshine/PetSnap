@@ -35,6 +35,7 @@ class FollowersAdapter(
     inner class FollowerViewHolder(private val binding: RvFragmentFriendsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(friendship: FriendshipResponse) {
+
             binding.apply {
                 // загрузка аватара
                 Glide.with(itemView.context)
@@ -46,13 +47,12 @@ class FollowersAdapter(
                 friendsUsername.text = friendship.username
                 subscribeToggleButton.isChecked = friendship.followedByUser
 
-                //
-                subscribeToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
+                subscribeToggleButton.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) { // если подписывается
-                        //TODO: viewModel.followUser()
+                        viewModel.followUser(friendship.id)
 
                     } else { // если отписывается
-                        //TODO: viewModel.unfollowUser()
+                         viewModel.unfollowUser(friendship.id)
                     }
                 }
             }

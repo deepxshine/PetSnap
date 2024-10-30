@@ -10,7 +10,7 @@ import com.example.petsnap.R
 import com.example.petsnap.databinding.RvFragmentFriendsBinding
 import com.example.petsnap.domain.model.FriendshipResponse
 
-class FollowingsAdapter(
+class FollowingsAdapter (
     private val viewModel: FriendsViewModel
 ) : ListAdapter<FriendshipResponse, FollowingsAdapter.FollowingViewHolder>(FRIENDSHIP_COMPARATOR) {
 
@@ -47,11 +47,9 @@ class FollowingsAdapter(
                 subscribeToggleButton.isChecked = friendship.followedByUser
 
 
-                subscribeToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
-                    if (isChecked) {
-                        viewModel.followUser()
-                    } else {
-                        viewModel.unfollowUser()
+                subscribeToggleButton.setOnCheckedChangeListener { _, isChecked ->
+                    if (!isChecked) { // если отписывается
+                        viewModel.unfollowUser(friendship.id)
                     }
                 }
             }
