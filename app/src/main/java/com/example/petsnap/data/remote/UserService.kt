@@ -4,6 +4,7 @@ import com.example.petsnap.domain.model.UserFollowersAndFollowings
 import com.example.petsnap.domain.model.UserProfile
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -20,5 +21,16 @@ interface UserService {
         @Path("userId") userId: Long
     ): Response<UserFollowersAndFollowings>
 
+    @POST("user/follow/{followerId}/{followingId}")
+    suspend fun followUser(
+        @Path("followerId") followerId: Long,
+        @Path("followingId") followingId: Long
+    ): Response<String>
+
+    @POST("user/unfollow/{followerId}/{followingId}")
+    suspend fun unfollowUser(
+        @Path("followerId") followerId: Long,
+        @Path("followingId") followingId: Long
+    ): Response<String>
 }
  
