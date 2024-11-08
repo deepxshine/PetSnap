@@ -13,7 +13,7 @@ class AuthService{
     
     private init() {}
     
-    func login(username: String, password: String, completion: @escaping (Result<String, Error>)-> Void) {
+    func login(username: String, password: String, completion: @escaping (Result<(token: String, userId: Int), Error>)-> Void) {
         var request = URLRequest(url: loginURL)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -32,7 +32,7 @@ class AuthService{
             }
             do {
                 let loginResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
-                completion(.success(loginResponse.token))
+                completion(.success((token: loginResponse.token, userId: loginResponse.userId)))
                 
             } catch {
                 completion(.failure(error))

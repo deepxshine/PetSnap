@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C42895862CC3EBAD0013327D /* Build configuration list for PBXProject "PenSnap" */;
+			buildConfigurationList = C42895862CC3EBAD0013327D /* Build configuration list for PBXProject "PetSnap" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -303,7 +303,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C42895862CC3EBAD0013327D /* Build configuration list for PBXProject "PenSnap" */ = {
+		C42895862CC3EBAD0013327D /* Build configuration list for PBXProject "PetSnap" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C42895972CC3EBAE0013327D /* Debug */,
