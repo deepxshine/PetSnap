@@ -1,24 +1,21 @@
 //
 //  ContentView.swift
-//  PetSnap
+//  PenSnap
 //
-//  Created by Алексей Евдокимов on 09.11.2024.
+//  Created by Алексей Евдокимов on 19.10.2024.
 //
 
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var appViewModel: AppViewModel
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if appViewModel.isAuthenticated {
+            MainView()
+                .environmentObject(appViewModel)
+        } else {
+            AuthView()
+                .environmentObject(appViewModel)
         }
-        .padding()
     }
-}
-
-#Preview {
-    ContentView()
 }

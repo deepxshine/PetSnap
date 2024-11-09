@@ -1,17 +1,20 @@
 //
-//  PetSnapApp.swift
-//  PetSnap
+//  PenSnapApp.swift
+//  PenSnap
 //
-//  Created by Алексей Евдокимов on 09.11.2024.
+//  Created by Алексей Евдокимов on 19.10.2024.
 //
 
 import SwiftUI
 
 @main
-struct PetSnapApp: App {
+struct PenSnapApp: App {
+    @StateObject private var appViewModel = AppViewModel()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appViewModel)
         }
     }
 }
