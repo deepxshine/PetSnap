@@ -20,7 +20,7 @@ class PostViewModel: ObservableObject {
     
     func getPosts(page: Int, completion: @escaping ([Post]?) -> Void){
         if let userId = self.userId {
-            PostService.shared.getPosts(userId: userId, page: page) {result in
+            PostController.shared.getPosts(userId: userId, page: page) {result in
                 print(result)
                 switch result {
                 case .success(let posts):

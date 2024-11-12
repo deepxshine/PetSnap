@@ -8,8 +8,8 @@
 import Foundation
 
 
-class PostService{
-    static let shared = PostService()
+class PostController{
+    static let shared = PostController()
     static let userId: String = String(KeychainManager.shared.getCredentials().userId!)
     private let postUrl = Constants.apiUrl + "/posts/"
     

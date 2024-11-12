@@ -97,7 +97,7 @@ struct HomeView: View {
                     self.posts.append(contentsOf: fetchedPosts)
                     self.currentPage += 1
                     
-                    if fetchedPosts.count < Constants.postCount {
+                    if fetchedPosts.count < ConstantsService.postCount {
                         isFinished = true
                     }
                 } else {
