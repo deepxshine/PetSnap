@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 
-class AppViewModel: ObservableObject {
+class AppViewController: ObservableObject {
     @Published var isAuthenticated = false
     @Published var username: String = ""
     @Published var password: String = ""

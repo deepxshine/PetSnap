@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var postViewModel = PostViewModel()
+    @StateObject private var postViewModel = PostViewController()
     @State private var posts: [Post] = []
     @State private var isLoading = false
     @State private var isFinished = false

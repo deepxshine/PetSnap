@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct AuthView: View {
-    @EnvironmentObject var appViewModel: AppViewModel
+    @EnvironmentObject var appViewModel: AppViewController
     
     var body: some View {
         VStack {

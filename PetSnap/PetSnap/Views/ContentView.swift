@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var appViewModel: AppViewModel
+    @EnvironmentObject var appViewModel: AppViewController
     var body: some View {
         if appViewModel.isAuthenticated {
             MainView()
