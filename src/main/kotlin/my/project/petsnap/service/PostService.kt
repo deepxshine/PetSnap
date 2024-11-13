@@ -99,7 +99,6 @@ class PostService(
                     avatar = post.user.avatar
                 ),
                 postTime = post.postTime,
-                // todo: comments
                 commentsCount = post.comments.count(),
                 likesCount = post.likes.count(),
                 likedByUser = likeRepository.existsByUserAndPost(user, post),

@@ -66,19 +66,15 @@ class UserService(
         userRepository.save(user)
     }
 
-    fun searchUser(username: String): UserSearchResponseDTO? {
-        val existingUser = userRepository.findByUsername(username).orElse(null)
-        if (existingUser != null) {
-            val userData = UserSearchResponseDTO(
-                id = existingUser.id!!,
-                username = existingUser.username,
-                avatar = existingUser.avatar
-            )
-            return userData
-        } else {
-            return null
-        }
+    fun searchUser(username: String): List<UserSearchResponseDTO> {
+        val users = userRepository.findAllByUsernameContainsIgnoreCase(username)
+        val foundUsers = users.map { user -> UserSearchResponseDTO(
+            id = user.id!!,
+            username = user.username,
+            avatar = user.avatar
+        ) }
 
+        return foundUsers
     }
 
     fun getUserPage(userId: Long, page: Int, size: Int): UserPageResponseDTO? {
@@ -100,7 +96,7 @@ class UserService(
                     likesCount = post.likes.count(),
                     likedByUser = likeRepository.existsByUserAndPost(user, post),
 
-                )
+                    )
 
             }
 
@@ -127,7 +123,7 @@ class UserService(
             friendshipRepository.save(friendship)
 
             // вернуть данные подписанного
-             FollowDTO(
+            FollowDTO(
                 id = following.id!!,
                 username = following.username,
                 avatar = following.avatar,
@@ -216,11 +212,15 @@ class UserService(
         }
 
         // generate image url
-        val avatarUrl = if (file != null) {imageUtils.generateUrl(file)} else null
+        val avatarUrl = if (file != null) {
+            imageUtils.generateUrl(file)
+        } else null
 
 
         // change birthday String to localDate
-        val localDateBirthday = if (!birthday.isNullOrEmpty()) {DateUtils.changeDateFormat(birthday)} else null
+        val localDateBirthday = if (!birthday.isNullOrEmpty()) {
+            DateUtils.changeDateFormat(birthday)
+        } else null
 
         // generate user info
         val userInfo = InputUserInfoRequestDTO(
@@ -233,9 +233,9 @@ class UserService(
         return ResponseEntity.ok(userInfo)
     }
 
-    fun existUser (username: String): Boolean {
-        val existingUser = searchUser(username)
-        return existingUser != null
+    fun existUser(username: String): Boolean {
+        val existingUser = userRepository.findByUsername(username)
+        return existingUser.isPresent
     }
 
 }
