@@ -8,8 +8,6 @@ data class PostsOnMainPageResponseDTO(
     val text: String?,
     val user: UserSearchResponseDTO,
     val postTime: LocalDateTime,
-// todo:    val comments: List<CommentResponseDTO>,
-
     val commentsCount: Int,
     val likesCount: Int,
     val likedByUser: Boolean,

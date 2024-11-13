@@ -118,12 +118,8 @@ class UserController(
     fun searchUser(
         @Parameter(description = "Username", required = true) @RequestParam username: String,
     ): ResponseEntity<Any> {
-        val existingUser = userService.searchUser(username)
-        return if (existingUser != null) {
-            ResponseEntity.ok(existingUser)
-        } else {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "User not found"))
-        }
+        val foundUsers = userService.searchUser(username)
+        return ResponseEntity.ok(foundUsers)
     }
 
     @PostMapping("/follow/{followerId}/{followingId}")
