@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct PenSnapApp: App {
-    @StateObject private var appViewModel = AppViewModel()
+    @StateObject private var appViewModel = AppViewController()
 
     var body: some Scene {
         WindowGroup {

@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var postViewModel = PostViewModel()
+    @StateObject private var postViewModel = PostViewController()
     @State private var posts: [Post] = []
     @State private var isLoading = false
     @State private var isFinished = false
@@ -97,7 +97,7 @@ struct HomeView: View {
                     self.posts.append(contentsOf: fetchedPosts)
                     self.currentPage += 1
                     
-                    if fetchedPosts.count < Constants.postCount {
+                    if fetchedPosts.count < ConstantsService.postCount {
                         isFinished = true
                     }
                 } else {

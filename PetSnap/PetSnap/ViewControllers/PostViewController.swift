@@ -1,16 +1,16 @@
 //
-//  PostViewModel.swift
-//  PenSnap
+//  PostViewController.swift
+//  PetSnap
 //
-//  Created by Алексей Евдокимов on 08.11.2024.
+//  Created by Алексей Евдокимов on 13.11.2024.
 //
 
 import Foundation
 import SwiftUI
 
 
-class PostViewModel: ObservableObject {
-    @Published var appViewModel = AppViewModel()
+class PostViewController: ObservableObject {
+    @Published var appViewModel = AppViewController()
     private var userId = KeychainManager.shared.getCredentials().userId
     
     
@@ -20,15 +20,12 @@ class PostViewModel: ObservableObject {
     
     func getPosts(page: Int, completion: @escaping ([Post]?) -> Void){
         if let userId = self.userId {
-            PostService.shared.getPosts(userId: userId, page: page) {result in
-                print(result)
+            PostController.shared.getPosts(userId: userId, page: page) {result in
                 switch result {
                 case .success(let posts):
                     completion(posts)
-                    print("Post has been got")
                     
-                case .failure(let error):
-                    print(error)
+                case .failure(_):
                     completion(nil)
                 }
             }

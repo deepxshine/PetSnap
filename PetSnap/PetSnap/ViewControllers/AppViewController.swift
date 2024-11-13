@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 
-class AppViewModel: ObservableObject {
+class AppViewController: ObservableObject {
     @Published var isAuthenticated = false
     @Published var username: String = ""
     @Published var password: String = ""
@@ -20,7 +20,7 @@ class AppViewModel: ObservableObject {
     }
     
     func login(completion: @escaping (Bool) -> Void) {
-        AuthService.shared.login(username: username, password: password) { result in
+        AuthController.shared.login(username: username, password: password) { result in
             switch result {
             case .success(let credentials):
                 let token = credentials.token

@@ -8,17 +8,17 @@
 import Foundation
 
 
-class PostService{
-    static let shared = PostService()
+class PostController{
+    static let shared = PostController()
     static let userId: String = String(KeychainManager.shared.getCredentials().userId!)
-    private let postUrl = Constants.apiUrl + "/posts/"
+    private let postUrl = ConstantsService.apiUrl + "/posts/main/"
     
     private init(){}
     
     func getPosts(userId: Int, page: Int, completion: @escaping(Result<[Post], Error>) -> Void) {
         print("Fetching posts for user ID: \(userId), page: \(page)")
         
-        guard let url = URL(string: self.postUrl + "main/\(userId)?page=\(page)&size=\(Constants.postCount)") else {
+        guard let url = URL(string: self.postUrl + "\(userId)?page=\(page)&size=\(ConstantsService.postCount)") else {
                     print("Invalid URL")
                     completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
                     return

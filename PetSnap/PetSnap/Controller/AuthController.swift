@@ -7,9 +7,9 @@
 
 import Foundation
 
-class AuthService{
-    static let shared = AuthService()
-    private let loginURL = URL(string: Constants.apiUrl + "/user/login")!
+class AuthController{
+    static let shared = AuthController()
+    private let loginURL = URL(string: ConstantsService.apiUrl + "/user/login")!
     
     private init() {}
     
