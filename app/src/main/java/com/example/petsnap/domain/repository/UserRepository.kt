@@ -4,6 +4,7 @@ import com.example.petsnap.domain.model.FollowAndUnfollowRequest
 import com.example.petsnap.domain.model.FriendshipResponse
 import com.example.petsnap.domain.model.UserFollowersAndFollowings
 import com.example.petsnap.domain.model.UserProfile
+import com.example.petsnap.domain.model.UserSearchResponse
 import com.example.petsnap.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
@@ -16,4 +17,5 @@ interface UserRepository {
 
     suspend fun unfollowUser(unfollowRequest: FollowAndUnfollowRequest): Resource<FriendshipResponse>
 
+    suspend fun searchUsers(username: String): List<UserSearchResponse>
 }

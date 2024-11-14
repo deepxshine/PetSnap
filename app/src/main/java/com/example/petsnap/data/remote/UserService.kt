@@ -3,6 +3,7 @@ package com.example.petsnap.data.remote
 import com.example.petsnap.domain.model.FriendshipResponse
 import com.example.petsnap.domain.model.UserFollowersAndFollowings
 import com.example.petsnap.domain.model.UserProfile
+import com.example.petsnap.domain.model.UserSearchResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -33,5 +34,10 @@ interface UserService {
         @Path("followerId") followerId: Long,
         @Path("followingId") followingId: Long
     ): Response<FriendshipResponse>
+
+    @GET("/user/search")
+    suspend fun searchUsers(
+        @Query("username") username: String
+    ): List<UserSearchResponse>
 }
  

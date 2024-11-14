@@ -1,38 +1,90 @@
 package com.example.petsnap.ui.search
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.petsnap.databinding.FragmentSearchBinding
+import com.example.petsnap.utils.Status
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
+    private val viewModel: SearchViewModel by viewModels()
+    private lateinit var usersAdapter: UsersAdapter
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val searchViewModel =
-            ViewModelProvider(this).get(SearchViewModel::class.java)
-
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        return binding.root
+    }
 
-        val textView: TextView = binding.textSearch
-        searchViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupObservers()
+
+        //слушатель изменений текста для поиска
+        binding.searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    viewModel.setSearchQuery(it.toString())
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
+    private fun setupRecyclerView() {
+        usersAdapter = UsersAdapter(listOf())
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = usersAdapter
         }
-        return root
+    }
+
+    private fun setupObservers() {
+        viewModel.searchResults.observe(viewLifecycleOwner) { resource ->
+            when (resource.status) {
+                Status.LOADING -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.recyclerView.visibility = View.GONE
+                    binding.emptyTextView.visibility = View.GONE
+                }
+                Status.SUCCESS -> {
+                    binding.progressBar.visibility = View.GONE
+                    val users = resource.data.orEmpty()
+                    if (users.isEmpty() && binding.searchEditText.text.isNotEmpty()) {
+                        binding.recyclerView.visibility = View.GONE
+                        binding.emptyTextView.visibility = View.VISIBLE
+                    } else {
+                        binding.recyclerView.visibility = View.VISIBLE
+                        binding.emptyTextView.visibility = View.GONE
+                        usersAdapter.updateUsers(users)
+                    }
+                }
+                Status.ERROR -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.recyclerView.visibility = View.GONE
+                    binding.emptyTextView.visibility = View.VISIBLE
+                    binding.emptyTextView.text = resource.message
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -40,3 +92,4 @@ class SearchFragment : Fragment() {
         _binding = null
     }
 }
+
