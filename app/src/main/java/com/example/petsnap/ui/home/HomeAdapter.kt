@@ -2,21 +2,31 @@ package com.example.petsnap.ui.home
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.petsnap.R
 import com.example.petsnap.databinding.RvFragmentHomeBinding
 import com.example.petsnap.domain.model.PostsOnMainPageResponse
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
-class HomeAdapter (
-    private val viewModel: HomeViewModel
+class HomeAdapter(
+    private val viewModel: HomeViewModel,
+    private val commentsViewModel: CommentsViewModel,
+    private val lifecycleOwner: HomeFragment
 ) :
     PagingDataAdapter<PostsOnMainPageResponse, HomeAdapter.HomeViewHolder>(POST_COMPARATOR) {
-
 
     companion object {
         private val POST_COMPARATOR = object : DiffUtil.ItemCallback<PostsOnMainPageResponse>() {
@@ -36,10 +46,17 @@ class HomeAdapter (
         }
     }
 
+    private val expandedPostIds: MutableSet<Long> = mutableSetOf() // 设置一个列表来存储哪些帖子的评论列表是展开的
+
 
     inner class HomeViewHolder(private val binding: RvFragmentHomeBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(post: PostsOnMainPageResponse) {
+
+        fun bind(
+            post: PostsOnMainPageResponse,
+            lifecycleOwner: LifecycleOwner,
+            isExpanded: Boolean,
+        ) {
             binding.apply {
 
                 Glide.with(itemView.context)
@@ -65,18 +82,103 @@ class HomeAdapter (
                 postLike.setColorFilter(likeColor)
 
                 // like listener
-                val sharedPreferences = itemView.context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                val sharedPreferences =
+                    itemView.context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
                 val userId = sharedPreferences.getLong("user_id", -1L)
+
                 postLike.setOnClickListener {
                     viewModel.addOrRemoveLike(post.id, userId)
+
+                    // 更新点赞状态
+                    post.likedByUser = !post.likedByUser
+
+                    val newLikeColor = if (post.likedByUser) {
+                        ContextCompat.getColor(itemView.context, R.color.red)
+                    } else {
+                        ContextCompat.getColor(itemView.context, R.color.black)
+                    }
+                    postLike.setColorFilter(newLikeColor)
+
+                    postLike.invalidate() // 局部更新点赞按钮的 UI
+
+                    // 更新likesCount
+                    if (post.likedByUser) {
+                        post.likesCount++
+                    } else {
+                        post.likesCount--
+                    }
+
+                    likesCount.text = post.likesCount.toString()
+
+                    likesCount.invalidate()
                 }
 
                 likesCount.text = post.likesCount.toString()
 
                 commentsCount.text = post.commentsCount.toString()
 
-            }
+                // comments section inflate
+                binding.commentRvView.apply {
+                    layoutManager =
+                        LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
+                }
 
+                // show or hide comment section
+                binding.commentRvView.visibility = if (isExpanded) View.VISIBLE else View.GONE
+                binding.addCommentText.visibility = if (isExpanded) View.VISIBLE else View.GONE
+                binding.commentSendButton.visibility = if (isExpanded) View.VISIBLE else View.GONE
+
+                lifecycleOwner.lifecycleScope.launch {
+                    lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        commentsViewModel.uiState.collectLatest { commentsState ->
+                            when (commentsState) {
+                                is CommentsState.Initial -> {}
+                                is CommentsState.Loading -> {}
+                                is CommentsState.Success -> {
+
+                                    val comments = commentsState.comments[post.id]
+                                    if (comments != null) {
+                                        // 每个帖子的评论应该是独立的，需要为每个帖子创建一个独立的 CommentAdapter 实例
+                                        val commentAdapter = CommentAdapter()
+                                        binding.commentRvView.adapter = commentAdapter
+                                        commentAdapter.submitData(comments)
+                                    }
+                                }
+
+                                is CommentsState.Error -> {
+                                    Toast.makeText(
+                                        itemView.context,
+                                        commentsState.msg,
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                // comment listener
+                postComment.setOnClickListener {
+
+                    if (isExpanded) {
+                        expandedPostIds.remove(post.id)
+                        binding.commentRvView.visibility = View.GONE
+                        binding.addCommentText.visibility = View.GONE
+                        binding.commentSendButton.visibility = View.GONE
+
+                    } else {
+                        expandedPostIds.add(post.id)
+
+                        // load post comments
+                        commentsViewModel.loadComments(post.id, userId)
+                    }
+                    //notify item changed
+                    notifyItemChanged(bindingAdapterPosition)
+
+                }
+
+            }
         }
     }
 
@@ -90,10 +192,18 @@ class HomeAdapter (
 
     override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
         val post = getItem(position)
+
+        //获取帖子的评论区展开状态
+        val isExpanded = expandedPostIds.contains(post?.id)
+
         post?.let {
-            holder.bind(it)
+            holder.bind(
+                it,
+                lifecycleOwner,
+                isExpanded, //isExpanded - 帖子的列表是否为展开状态
+                //               commentsState
+            )
         }
     }
-
 
 }

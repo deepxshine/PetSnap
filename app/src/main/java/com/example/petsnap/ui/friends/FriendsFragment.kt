@@ -51,24 +51,24 @@ class FriendsFragment : Fragment() {
         setUpRV()
 
         binding.followerButton.setOnClickListener {
-            println("click")
+
             binding.rvFragmentFriends.adapter = followersAdapter
             viewModel.uiState.value.let { state ->
-                println("enter")
+
                 if (state is FriendsScreenState.Success) {
-                    println("${state.followersList}")
+
                     followersAdapter.submitList(state.followersList)
                 }
             }
         }
 
         binding.followingButton.setOnClickListener {
-            println("click")
+
             binding.rvFragmentFriends.adapter = followingsAdapter
             viewModel.uiState.value.let { state ->
-                println("enter")
+
                 if (state is FriendsScreenState.Success) {
-                    println("${state.followingsList}")
+
                     followingsAdapter.submitList(state.followingsList)
                 }
             }
