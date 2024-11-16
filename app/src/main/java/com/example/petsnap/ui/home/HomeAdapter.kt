@@ -118,15 +118,15 @@ class HomeAdapter(
                 commentsCount.text = post.commentsCount.toString()
 
                 // comments section inflate
-                binding.commentRvView.apply {
+                commentRvView.apply {
                     layoutManager =
                         LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
                 }
 
                 // show or hide comment section
-                binding.commentRvView.visibility = if (isExpanded) View.VISIBLE else View.GONE
-                binding.addCommentText.visibility = if (isExpanded) View.VISIBLE else View.GONE
-                binding.commentSendButton.visibility = if (isExpanded) View.VISIBLE else View.GONE
+                commentRvView.visibility = if (isExpanded) View.VISIBLE else View.GONE
+                addCommentText.visibility = if (isExpanded) View.VISIBLE else View.GONE
+                commentSendButton.visibility = if (isExpanded) View.VISIBLE else View.GONE
 
                 lifecycleOwner.lifecycleScope.launch {
                     lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -163,19 +163,39 @@ class HomeAdapter(
 
                     if (isExpanded) {
                         expandedPostIds.remove(post.id)
-                        binding.commentRvView.visibility = View.GONE
-                        binding.addCommentText.visibility = View.GONE
-                        binding.commentSendButton.visibility = View.GONE
+                        commentRvView.visibility = View.GONE
+                        addCommentText.visibility = View.GONE
+                        commentSendButton.visibility = View.GONE
 
                     } else {
                         expandedPostIds.add(post.id)
 
                         // load post comments
                         commentsViewModel.loadComments(post.id, userId)
+
+
                     }
                     //notify item changed
                     notifyItemChanged(bindingAdapterPosition)
 
+                }
+
+                // add a comment
+                commentSendButton.setOnClickListener {
+                    val commentTxt = addCommentText.text.toString().trimIndent()
+                    if (commentTxt.isNotEmpty()) {
+                        commentsViewModel.addComment(userId, post.id, commentTxt)
+
+                        // изменить количество комментариев
+                        post.commentsCount++
+                        commentsCount.text = post.commentsCount.toString()
+
+                        addCommentText.invalidate()
+                        //notify item changed
+                        notifyItemChanged(bindingAdapterPosition)
+                    } else {
+                        Toast.makeText(itemView.context, "Comment text cannot be empty", Toast.LENGTH_LONG).show()
+                    }
                 }
 
             }

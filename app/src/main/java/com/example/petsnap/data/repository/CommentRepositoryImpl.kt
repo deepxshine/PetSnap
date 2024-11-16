@@ -6,6 +6,8 @@ import com.example.petsnap.data.remote.CommentService
 import com.example.petsnap.domain.model.CommentsRequest
 import com.example.petsnap.domain.model.CommentsResponse
 import com.example.petsnap.domain.repository.CommentRepository
+import com.example.petsnap.utils.Resource
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 class CommentRepositoryImpl @Inject constructor(private val commentService: CommentService) : CommentRepository {
@@ -36,8 +38,18 @@ class CommentRepositoryImpl @Inject constructor(private val commentService: Comm
         }
     }
 
-    override suspend fun addComment() {
-        TODO("Not yet implemented")
+    override suspend fun addComment(userId: Long, postId: Long, comment: String): Resource<CommentsResponse> {
+        return try {
+            val commentText = comment.toRequestBody()
+            val response = commentService.addComment(userId, postId, commentText)
+            if (response.isSuccessful) {
+                Resource.success(response.body())
+            } else {
+                Resource.error(response.message(), null)
+            }
+        } catch (e: Exception) {
+            Resource.error(e.message ?: "Unknown error", null)
+        }
     }
 
     override suspend fun deleteComment() {

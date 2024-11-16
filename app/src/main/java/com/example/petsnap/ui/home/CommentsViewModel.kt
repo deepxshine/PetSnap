@@ -8,7 +8,9 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.petsnap.domain.model.CommentsRequest
 import com.example.petsnap.domain.model.CommentsResponse
+import com.example.petsnap.domain.usecase.AddCommentUseCase
 import com.example.petsnap.domain.usecase.GetPostCommentsUseCase
+import com.example.petsnap.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,14 +21,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CommentsViewModel @Inject constructor(
-    private val getPostCommentsUseCase: GetPostCommentsUseCase
+    private val getPostCommentsUseCase: GetPostCommentsUseCase,
+    private val addCommentUseCase: AddCommentUseCase
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<CommentsState> =
         MutableStateFlow(CommentsState.Initial)
     val uiState: StateFlow<CommentsState> = _uiState.asStateFlow()
 
-    private suspend fun getComments(
+    private suspend fun getCommentsData(
         commentsRequest: CommentsRequest
     ): Flow<PagingData<CommentsResponse>> {
         val comments = getPostCommentsUseCase(commentsRequest)
@@ -41,25 +44,39 @@ class CommentsViewModel @Inject constructor(
         ).flow.cachedIn(viewModelScope)
     }
 
+    private suspend fun getComments(postId: Long, userId: Long) {
+        try {
+            val commentsRequest = CommentsRequest(postId, userId)
+            getCommentsData(commentsRequest).collect { comments ->
+                _uiState.value = CommentsState.Success(
+                    comments = mutableMapOf(postId to comments)
+                )
+            }
+
+        } catch (e: Exception) {
+            _uiState.value = CommentsState.Error(e.message ?: "Unknown error")
+        }
+    }
+
     fun loadComments(postId: Long, userId: Long) {
         viewModelScope.launch {
 
             _uiState.value = CommentsState.Loading(
                 comments = mutableMapOf(),
             )
+            getComments(postId, userId)
+        }
+    }
 
-            try {
-                val commentsRequest = CommentsRequest(postId, userId)
-                getComments(commentsRequest).collect { comments ->
-                    _uiState.value = CommentsState.Success(
-                        comments = mutableMapOf(postId to comments)
-                    )
-                }
-
-            } catch (e: Exception) {
-                _uiState.value = CommentsState.Error(e.message ?: "Unknown error")
+    fun addComment(userId: Long, postId: Long, comment: String) {
+        viewModelScope.launch {
+            val response = addCommentUseCase(userId, postId, comment)
+            val currentState = _uiState.value
+            if (currentState is CommentsState.Success) {
+                getComments(postId, userId)
+            } else {
+                response.message?.let { Resource.error(it, null) }
             }
-
         }
     }
 

@@ -6,7 +6,7 @@ data class PostsOnMainPageResponse(
     val text: String?,
     val user: UserSearchResponse,
     val postTime: String,
-    val commentsCount: Int,
+    var commentsCount: Int,
     var likesCount: Int,
     var likedByUser: Boolean
 )

@@ -92,14 +92,13 @@
         tools:listitem="@layout/rv_comment_section"
         android:visibility="gone"/>
 
-        <TextView
+        <EditText
             android:id="@+id/add_comment_text"
             android:layout_width="290dp"
             android:layout_height="wrap_content"
             android:minHeight="30dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="@string/comment_text"
+            android:hint="add a comment"
             android:visibility="gone"/>
 
         <Button
