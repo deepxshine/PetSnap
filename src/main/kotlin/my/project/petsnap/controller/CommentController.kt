@@ -19,9 +19,10 @@ class CommentController(private val commentService: CommentService) {
         @Parameter(description = "Post ID", required = true) @PathVariable postId: Long,
         @Parameter(description = "User ID", required = true) @PathVariable userId: Long,
         @Parameter(description = "Page number", required = false) @RequestParam(defaultValue = "0") page: Int,
-        @Parameter(description = "Page size", required = false) @RequestParam(defaultValue = "9") size: Int
+        @Parameter(description = "Page size", required = false) @RequestParam(defaultValue = "10") size: Int
     ): ResponseEntity<Any> {
-        return commentService.getCommentsByPostId(postId, userId, page, size)
+        val comments = commentService.getCommentsByPostId(postId, userId, page, size)
+        return ResponseEntity.ok(comments)
     }
 
     @PostMapping("/addComment/{userId}/{postId}")

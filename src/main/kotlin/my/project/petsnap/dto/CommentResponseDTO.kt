@@ -6,6 +6,6 @@ data class CommentResponseDTO(
     val id: Long,
     val comment: String,
     val commentTime: LocalDateTime,
-    val user: UserSearchResponseDTO,
+    val username: String,
     val commentedByUser: Boolean
 )
