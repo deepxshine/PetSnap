@@ -7,6 +7,7 @@ import my.project.petsnap.entity.CommentDB
 import my.project.petsnap.repository.CommentRepository
 import my.project.petsnap.repository.PostRepository
 import my.project.petsnap.repository.UserRepository
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
@@ -28,7 +29,7 @@ class CommentService(
         val post = postRepository.findById(postId).orElseThrow { EntityNotFoundException("Post not found") }
 
         val createdComment = CommentDB(
-            comment = comment,
+            comment = comment.trimIndent(),
             commentTime = LocalDateTime.now(),
             post = post,
             user = user,
@@ -36,9 +37,15 @@ class CommentService(
 
         commentRepository.save(createdComment)
 
-        val commentCreatedResponse = createCommentDTO(createdComment)
+        val commentCreatedResponse = CommentResponseDTO(
+            id = createdComment.id!!,
+            comment = createdComment.comment,
+            commentTime = createdComment.commentTime,
+            username = createdComment.user.username,
+            commentedByUser = true,
+        )
 
-        return ResponseEntity.ok(mapOf("message" to "Comment added", "comment" to commentCreatedResponse))
+        return ResponseEntity.ok(commentCreatedResponse)
     }
 
     fun removeComment(userId: Long, commentId: Long): ResponseEntity<Any> {
@@ -46,47 +53,30 @@ class CommentService(
 
         val comment = commentRepository.findById(commentId).orElseThrow { EntityNotFoundException("Comment not found") }
 
-        val removeCommentResponse = createCommentDTO(comment)
-
-        commentRepository.deleteById(commentId)
-        return ResponseEntity.ok(mapOf("message" to "Comment removed", "comment" to removeCommentResponse))
+        return if (comment.user.id != userId) {
+            ResponseEntity.badRequest().body(("message" to "You cannot delete other users' comments"))
+        } else {
+            commentRepository.deleteById(commentId)
+            ResponseEntity.ok(mapOf("message" to "Comment removed"))
+        }
     }
 
-    fun getCommentsByPostId(postId: Long, userId: Long, page: Int, size: Int): ResponseEntity<Any> {
+    fun getCommentsByPostId(postId: Long, userId: Long, page: Int, size: Int): Page<CommentResponseDTO> {
 
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "commentTime"))
         val commentsPage = commentRepository.findCommentDBByPostIdOrderByCommentTimeDesc(postId, pageable)
 
-        val commentsList = commentsPage.content.map { comment ->
+        return commentsPage.map { comment ->
             CommentResponseDTO(
                 id = comment.id!!,
                 comment = comment.comment,
                 commentTime = comment.commentTime,
-                user = UserSearchResponseDTO(
-                    id = comment.user.id!!,
-                    username = comment.user.username,
-                    avatar = comment.user.avatar,
-                ),
+                username = comment.user.username,
                 commentedByUser = comment.user.id == userId
             )
 
         }
 
-        return ResponseEntity.ok(mapOf("comments" to commentsList))
-    }
-
-    fun createCommentDTO(comment: CommentDB): CommentResponseDTO {
-        return CommentResponseDTO(
-            id = comment.id!!,
-            comment = comment.comment,
-            commentTime = comment.commentTime,
-            user = UserSearchResponseDTO(
-                id = comment.user.id!!,
-                username = comment.user.username,
-                avatar = comment.user.avatar
-            ),
-            commentedByUser = true,
-        )
 
     }
 
