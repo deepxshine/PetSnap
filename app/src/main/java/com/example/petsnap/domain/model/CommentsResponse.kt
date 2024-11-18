@@ -5,5 +5,6 @@ data class CommentsResponse(
     val comment: String,
     val commentTime: String,
     val username: String,
-    val commentedByUser: Boolean
+    val commentedByUser: Boolean,
+    val postId: Long
 )

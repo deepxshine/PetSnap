@@ -89,8 +89,10 @@
         android:id="@+id/comment_rv_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxHeight="80dp"
         tools:listitem="@layout/rv_comment_section"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        />
 
         <EditText
             android:id="@+id/add_comment_text"

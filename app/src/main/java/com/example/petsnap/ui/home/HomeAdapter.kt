@@ -46,8 +46,23 @@ class HomeAdapter(
         }
     }
 
+    private val onCommentDeleted: (postId: Long) -> Unit = {postId ->
+
+        for (i in 0..< itemCount) {
+            val post = getItem(i)
+            if (post?.id == postId) {
+                post.let {
+                    it.commentsCount--
+                    notifyItemChanged(i)
+                }
+            }
+        }
+    }
+
     private val expandedPostIds: MutableSet<Long> = mutableSetOf() // 设置一个列表来存储哪些帖子的评论列表是展开的
 
+
+    private val recycledViewPool = RecyclerView.RecycledViewPool()
 
     inner class HomeViewHolder(private val binding: RvFragmentHomeBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -56,8 +71,15 @@ class HomeAdapter(
             post: PostsOnMainPageResponse,
             lifecycleOwner: LifecycleOwner,
             isExpanded: Boolean,
+            onCommentDeleted: (postId: Long) -> Unit,
         ) {
             binding.apply {
+
+                // 每个帖子的评论应该是独立的，需要为每个帖子创建一个独立的 CommentAdapter 实例
+                //val commentAdapter = CommentAdapter(commentsViewModel)
+                val commentAdapter = CommentAdapter(commentsViewModel, onCommentDeleted)
+                commentRvView.adapter = commentAdapter
+                commentRvView.setRecycledViewPool(recycledViewPool) // 设置 RecycledViewPool, RecycledViewPool 可以确保内层 RecyclerView 的视图复用不会受到外层 RecyclerView 的影响
 
                 Glide.with(itemView.context)
                     .load(post.user.avatar)
@@ -129,6 +151,7 @@ class HomeAdapter(
                 commentSendButton.visibility = if (isExpanded) View.VISIBLE else View.GONE
 
                 lifecycleOwner.lifecycleScope.launch {
+                    // viewHolder是没有生命周期的，要使用生命周期，可以使用 CoroutineScope 或 viewLifecycleOwner.lifecycleScope
                     lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                         commentsViewModel.uiState.collectLatest { commentsState ->
                             when (commentsState) {
@@ -138,10 +161,9 @@ class HomeAdapter(
 
                                     val comments = commentsState.comments[post.id]
                                     if (comments != null) {
-                                        // 每个帖子的评论应该是独立的，需要为每个帖子创建一个独立的 CommentAdapter 实例
-                                        val commentAdapter = CommentAdapter()
-                                        binding.commentRvView.adapter = commentAdapter
+
                                         commentAdapter.submitData(comments)
+
                                     }
                                 }
 
@@ -161,6 +183,7 @@ class HomeAdapter(
                 // comment listener
                 postComment.setOnClickListener {
 
+
                     if (isExpanded) {
                         expandedPostIds.remove(post.id)
                         commentRvView.visibility = View.GONE
@@ -168,16 +191,15 @@ class HomeAdapter(
                         commentSendButton.visibility = View.GONE
 
                     } else {
+
                         expandedPostIds.add(post.id)
 
                         // load post comments
                         commentsViewModel.loadComments(post.id, userId)
 
-
                     }
                     //notify item changed
                     notifyItemChanged(bindingAdapterPosition)
-
                 }
 
                 // add a comment
@@ -190,8 +212,9 @@ class HomeAdapter(
                         post.commentsCount++
                         commentsCount.text = post.commentsCount.toString()
 
-                        addCommentText.invalidate()
-                        //notify item changed
+                        addCommentText.text.clear()
+
+                        //notify item inserted
                         notifyItemChanged(bindingAdapterPosition)
                     } else {
                         Toast.makeText(itemView.context, "Comment text cannot be empty", Toast.LENGTH_LONG).show()
@@ -221,7 +244,7 @@ class HomeAdapter(
                 it,
                 lifecycleOwner,
                 isExpanded, //isExpanded - 帖子的列表是否为展开状态
-                //               commentsState
+                onCommentDeleted
             )
         }
     }

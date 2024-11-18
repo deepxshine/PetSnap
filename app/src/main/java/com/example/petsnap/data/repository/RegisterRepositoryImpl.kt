@@ -3,7 +3,7 @@ package com.example.petsnap.data.repository
 
 import com.example.petsnap.data.remote.RegisterService
 import com.example.petsnap.domain.model.RegisterRequest
-import com.example.petsnap.domain.model.RegisterResponse
+import com.example.petsnap.domain.model.ResponseMsg
 import com.example.petsnap.domain.repository.RegisterRepository
 import com.example.petsnap.utils.Resource
 import java.io.File
@@ -18,7 +18,7 @@ class RegisterRepositoryImpl @Inject constructor(private val registerService: Re
         birthday: String?,
         bio: String?,
         file: File?
-    ): Resource<RegisterResponse> {
+    ): Resource<ResponseMsg> {
         return try {
             val registerRequest = RegisterRequest(username, password, birthday, bio, file)
 

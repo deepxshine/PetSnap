@@ -5,6 +5,7 @@ import androidx.paging.PagingState
 import com.example.petsnap.data.remote.CommentService
 import com.example.petsnap.domain.model.CommentsRequest
 import com.example.petsnap.domain.model.CommentsResponse
+import com.example.petsnap.domain.model.ResponseMsg
 import com.example.petsnap.domain.repository.CommentRepository
 import com.example.petsnap.utils.Resource
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -52,8 +53,17 @@ class CommentRepositoryImpl @Inject constructor(private val commentService: Comm
         }
     }
 
-    override suspend fun deleteComment() {
-        TODO("Not yet implemented")
+    override suspend fun removeComment(userId: Long, commentId: Long): Resource<ResponseMsg> {
+        return try {
+            val response = commentService.removeComment(userId, commentId)
+            if (response.isSuccessful) {
+                Resource.success(response.body())
+            } else {
+                Resource.error(response.message(), null)
+            }
+        } catch (e: Exception) {
+            Resource.error(e.message ?: "Unknown error", null)
+        }
     }
 
 

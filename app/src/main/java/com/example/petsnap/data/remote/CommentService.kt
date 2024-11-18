@@ -2,9 +2,11 @@ package com.example.petsnap.data.remote
 
 import com.example.petsnap.domain.model.CommentsResponse
 import com.example.petsnap.domain.model.PageResponse
+import com.example.petsnap.domain.model.ResponseMsg
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -26,4 +28,10 @@ interface CommentService {
         @Path("postId") postId: Long,
         @Body comment: RequestBody
     ): Response<CommentsResponse>
+
+    @DELETE("/comments/removeComment/{userId}/{commentId}")
+    suspend fun removeComment(
+        @Path("userId") userId: Long,
+        @Path("commentId") commentId: Long
+    ): Response<ResponseMsg>
 }

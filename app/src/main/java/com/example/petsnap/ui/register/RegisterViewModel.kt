@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.petsnap.domain.model.RegisterResponse
+import com.example.petsnap.domain.model.ResponseMsg
 import com.example.petsnap.domain.usecase.RegisterUseCase
 import com.example.petsnap.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +17,8 @@ class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase
 ): ViewModel() {
 
-    private val _registerResult = MutableLiveData<Resource<RegisterResponse>>()
-    val registerResult: LiveData<Resource<RegisterResponse>> get() = _registerResult
+    private val _registerResult = MutableLiveData<Resource<ResponseMsg>>()
+    val registerResult: LiveData<Resource<ResponseMsg>> get() = _registerResult
 
     fun registerUser(username: String, password: String, birthday: String?, bio: String?, file: File?) {
         viewModelScope.launch {

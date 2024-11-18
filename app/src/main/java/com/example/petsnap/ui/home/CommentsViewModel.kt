@@ -10,19 +10,22 @@ import com.example.petsnap.domain.model.CommentsRequest
 import com.example.petsnap.domain.model.CommentsResponse
 import com.example.petsnap.domain.usecase.AddCommentUseCase
 import com.example.petsnap.domain.usecase.GetPostCommentsUseCase
+import com.example.petsnap.domain.usecase.RemoveCommentUseCase
 import com.example.petsnap.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CommentsViewModel @Inject constructor(
     private val getPostCommentsUseCase: GetPostCommentsUseCase,
-    private val addCommentUseCase: AddCommentUseCase
+    private val addCommentUseCase: AddCommentUseCase,
+    private val removeCommentUseCase: RemoveCommentUseCase
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<CommentsState> =
@@ -47,7 +50,7 @@ class CommentsViewModel @Inject constructor(
     private suspend fun getComments(postId: Long, userId: Long) {
         try {
             val commentsRequest = CommentsRequest(postId, userId)
-            getCommentsData(commentsRequest).collect { comments ->
+            getCommentsData(commentsRequest).collectLatest { comments ->
                 _uiState.value = CommentsState.Success(
                     comments = mutableMapOf(postId to comments)
                 )
@@ -74,6 +77,22 @@ class CommentsViewModel @Inject constructor(
             val currentState = _uiState.value
             if (currentState is CommentsState.Success) {
                 getComments(postId, userId)
+            } else {
+                response.message?.let { Resource.error(it, null) }
+            }
+        }
+    }
+
+    fun removeComment(userId: Long, commentId: Long, postId: Long) {
+        viewModelScope.launch {
+
+            val response = removeCommentUseCase(userId, commentId)
+
+            val currentState = _uiState.value
+            if (currentState is CommentsState.Success) {
+                // обновить комментарии
+                getComments(postId, userId)
+
             } else {
                 response.message?.let { Resource.error(it, null) }
             }

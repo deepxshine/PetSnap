@@ -1,6 +1,6 @@
 package com.example.petsnap.data.remote
 
-import com.example.petsnap.domain.model.RegisterResponse
+import com.example.petsnap.domain.model.ResponseMsg
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -18,6 +18,6 @@ interface RegisterService {
         @Part("birthday") birthday: RequestBody?,
         @Part("bio") bio: RequestBody?,
         @Part file: MultipartBody.Part?
-    ): Response<RegisterResponse>
+    ): Response<ResponseMsg>
 
 }
