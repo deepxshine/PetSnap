@@ -31,4 +31,18 @@ class PostViewController: ObservableObject {
             }
         }
     }
+    
+    func likePost(postId: Int, completion: @escaping (Bool?) -> Void){
+            PostController.shared.likePost(postId: postId){result in
+                switch result {
+                case .success(let result):
+                    completion(result)
+                    
+                case .failure(_):
+                    completion(nil)
+                }
+                
+            }
+        
+    }
 }
