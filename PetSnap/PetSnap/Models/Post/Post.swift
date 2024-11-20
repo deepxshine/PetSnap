@@ -12,6 +12,6 @@ struct Post: Codable, Identifiable {
     let user: User
     let postTime: String 
     let commentsCount: Int
-    let likesCount: Int
-    let likedByUser: Bool
+    var likesCount: Int
+    var likedByUser: Bool
 }

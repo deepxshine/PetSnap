@@ -10,8 +10,9 @@ import Foundation
 
 class PostController{
     static let shared = PostController()
-    static let userId: String = String(KeychainManager.shared.getCredentials().userId!)
+    private let userId: String = String(KeychainManager.shared.getCredentials().userId!)
     private let postUrl = ConstantsService.apiUrl + "/posts/main/"
+    private let likeUrl = ConstantsService.apiUrl + "/posts/like/"
     
     private init(){}
     
@@ -51,6 +52,37 @@ class PostController{
         task.resume()
         print("Request to fetch posts sent.")
         
+    }
+    
+    func likePost(postId: Int, completion: @escaping(Result<Bool, Error>) -> Void) {
+        guard let url = URL(string: self.likeUrl +  "\(postId)/\(userId)") else {
+                    print("Invalid URL")
+                    completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+                    return
+                }
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        print("Request URL: \(request.url?.absoluteString ?? "No URL")")
+        
+        let task = URLSession.shared.dataTask(with: request){data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                print("Error during request getPosts: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let _ = data else {
+                completion(.failure(NSError(domain: "No data", code: -1, userInfo: nil)))
+                print("No data received")
+                return
+            }
+            
+            completion(.success(true))
+                
+            }
+        
+        task.resume()
+        print("Request to fetch posts sent.")
     }
     
 }
