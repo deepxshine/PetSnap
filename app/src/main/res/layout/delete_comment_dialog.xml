@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+<!-- android:gravity="center" - чтобы кнопки в середине находились   -->
+
+    <Button
+        android:id="@+id/button_delete_comment"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/purple_700"
+        android:text="Delete" />
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/purple_700"
+        android:text="@string/cancel" />
+</LinearLayout>

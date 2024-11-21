@@ -26,10 +26,12 @@ class HomeFragment : Fragment() {
     private val binding: FragmentHomeBinding
         get() = _binding ?: throw IllegalStateException("FragmentHomeBinding is not initialized")
 
-    private val viewModel by viewModels<HomeViewModel>()
+    private val homeViewModel by viewModels<HomeViewModel>()
+
+    private val commentsViewModel by viewModels<CommentsViewModel>()
 
     private val homeAdapter by lazy {
-        HomeAdapter(viewModel)
+        HomeAdapter(homeViewModel, commentsViewModel, this)
     }
 
     override fun onCreateView(
@@ -44,23 +46,22 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpRV()
-        observeUiState()
+        setUpPostsRV()
+        observeHomeUiState()
         loadPosts()
     }
 
-    private fun setUpRV() {
+    private fun setUpPostsRV() {
         binding.rvFragmentHome.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = homeAdapter
-
         }
     }
 
-    private fun observeUiState() {
+    private fun observeHomeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collectLatest { state ->
+                homeViewModel.uiState.collectLatest { state ->
                     when (state) {
                         is HomeScreenState.Error -> {
                             Toast.makeText(requireContext(), state.msg, Toast.LENGTH_LONG).show()
@@ -98,7 +99,7 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), "User ID not found", Toast.LENGTH_SHORT).show()
             return
         } else {
-            viewModel.loadPosts(userId)
+            homeViewModel.loadPosts(userId)
         }
     }
 

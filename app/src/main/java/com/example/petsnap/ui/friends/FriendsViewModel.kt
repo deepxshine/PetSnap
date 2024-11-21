@@ -34,7 +34,7 @@ class FriendsViewModel @Inject constructor(
                 followingsList = listOf()
             )
             try {
-                getFriendshipUseCase(userId).collectLatest { friendship ->
+                getFriendshipUseCase(userId).collect { friendship ->
 
                     _uiState.value = FriendsScreenState.Success(
                         followersList = friendship.followersList,
@@ -58,7 +58,7 @@ class FriendsViewModel @Inject constructor(
             val currentState = _uiState.value
             if (currentState is FriendsScreenState.Success) {
                 try {
-                    getFriendshipUseCase(followerId).collectLatest { friendship ->
+                    getFriendshipUseCase(followerId).collect { friendship ->
 
                         _uiState.value = FriendsScreenState.Success(
                             followersList = friendship.followersList,
@@ -89,7 +89,7 @@ class FriendsViewModel @Inject constructor(
             if (currentState is FriendsScreenState.Success) {
 
                 try {
-                    getFriendshipUseCase(followerId).collectLatest { friendship ->
+                    getFriendshipUseCase(followerId).collect { friendship ->
 
                         _uiState.value = FriendsScreenState.Success(
                             followersList = friendship.followersList,

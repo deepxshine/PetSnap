@@ -25,7 +25,7 @@ interface PostService {
 
     @PUT("posts/like/{postId}/{userId}")
     suspend fun addOrRemoveLike(
-        @Path("postId") postId: Long,
+        @Path("postId") postId: Long, //@Path 注解中的名称必须与 Retrofit 接口方法中的路径参数名称一致。这样 Retrofit 才能正确地将路径参数替换到 URL 中。
         @Path("userId") userId: Long
     ): Response<LikeResponse>
 

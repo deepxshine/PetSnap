@@ -9,13 +9,13 @@ sealed class HomeScreenState {
 
     data object Initial : HomeScreenState()
 
-    //    data object Loading: HomeScreenState()
-    data class Loading(val posts: PagingData<PostsOnMainPageResponse> = PagingData.empty()) :
-        HomeScreenState()
+    data class Loading(
+        val posts: PagingData<PostsOnMainPageResponse> = PagingData.empty()
+    ): HomeScreenState()
 
     data class Success( // параметры для показа экрана в успешном состоянии
         val posts: PagingData<PostsOnMainPageResponse>, // posts state
-        val likeResult: Resource<LikeResponse>? = null // likeResult
+        val likeResult: Resource<LikeResponse>? = null, // likeResult
     ) : HomeScreenState()
 
     data class Error(val msg: String) : HomeScreenState()

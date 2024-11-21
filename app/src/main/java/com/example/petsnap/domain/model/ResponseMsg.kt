@@ -1,6 +1,6 @@
 package com.example.petsnap.domain.model
 
-data class RegisterResponse(
+data class ResponseMsg(
     val status: Int,
     val message: String
 )

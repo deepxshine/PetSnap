@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -37,15 +38,14 @@
         android:layout_width="match_parent"
         android:layout_height="254dp"
         android:layout_marginTop="8dp"
-        android:layout_marginStart="70dp"
         android:src="@drawable/ic_dashboard_black_24dp"
         android:contentDescription="@string/post_image"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:orientation="horizontal">
 
         <ImageView
@@ -85,12 +85,31 @@
 
     </LinearLayout>
 
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/rvCommentView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_marginStart="70dp"-->
-<!--        android:layout_marginTop="8dp"-->
-<!--        tools:listitem="@layout/rv_comment"/>-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/comment_rv_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="80dp"
+        tools:listitem="@layout/rv_comment_section"
+        android:visibility="gone"
+        />
+
+        <EditText
+            android:id="@+id/add_comment_text"
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            android:layout_marginTop="10dp"
+            android:hint="add a comment"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/comment_send_button"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-50dp"
+            android:layout_gravity="end"
+            android:text="Send"
+            android:visibility="gone"/>
 
 </LinearLayout>
