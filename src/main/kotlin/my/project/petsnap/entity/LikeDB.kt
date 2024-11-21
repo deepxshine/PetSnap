@@ -16,8 +16,3 @@ data class LikeDB(
     @JoinColumn(name = "post_id")
     var post: PostDB,
 )
-{
-    override fun toString(): String {
-        return "LikeDB(id=$id, userId=${user.id}, postId=${post.id}, likesOnPost=${post.likes.size})"
-    }
-}

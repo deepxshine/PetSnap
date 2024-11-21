@@ -32,7 +32,8 @@ class CommentController(private val commentService: CommentService) {
         @Parameter(description = "POST Id", required = true) @PathVariable postId: Long,
         @Parameter(description = "Comment Content", required = true) @RequestBody comment: String,
     ): ResponseEntity<Any> {
-        return commentService.addComment(userId, postId, comment)
+        val response = commentService.addComment(userId, postId, comment)
+        return ResponseEntity.ok(response)
     }
 
     @DeleteMapping("/removeComment/{userId}/{commentId}")
@@ -43,5 +44,4 @@ class CommentController(private val commentService: CommentService) {
     ): ResponseEntity<Any> {
         return commentService.removeComment(userId, commentId)
     }
-
 }

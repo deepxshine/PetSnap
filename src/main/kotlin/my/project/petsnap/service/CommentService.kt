@@ -2,7 +2,6 @@ package my.project.petsnap.service
 
 import jakarta.persistence.EntityNotFoundException
 import my.project.petsnap.dto.CommentResponseDTO
-import my.project.petsnap.dto.UserSearchResponseDTO
 import my.project.petsnap.entity.CommentDB
 import my.project.petsnap.repository.CommentRepository
 import my.project.petsnap.repository.PostRepository
@@ -23,7 +22,7 @@ class CommentService(
     private val postRepository: PostRepository,
 ) {
     @Transactional
-    fun addComment(userId: Long, postId: Long, comment: String): ResponseEntity<Any> {
+    fun addComment(userId: Long, postId: Long, comment: String): CommentResponseDTO {
 
         val user = userRepository.findById(userId).orElseThrow { EntityNotFoundException("User not found") }
         val post = postRepository.findById(postId).orElseThrow { EntityNotFoundException("Post not found") }
@@ -43,9 +42,10 @@ class CommentService(
             commentTime = createdComment.commentTime,
             username = createdComment.user.username,
             commentedByUser = true,
+            postId = createdComment.post.id!!
         )
 
-        return ResponseEntity.ok(commentCreatedResponse)
+        return commentCreatedResponse
     }
 
     fun removeComment(userId: Long, commentId: Long): ResponseEntity<Any> {
@@ -57,7 +57,7 @@ class CommentService(
             ResponseEntity.badRequest().body(("message" to "You cannot delete other users' comments"))
         } else {
             commentRepository.deleteById(commentId)
-            ResponseEntity.ok(mapOf("message" to "Comment removed"))
+            ResponseEntity.ok(mapOf("message" to "comment removed successfully"))
         }
     }
 
@@ -72,7 +72,8 @@ class CommentService(
                 comment = comment.comment,
                 commentTime = comment.commentTime,
                 username = comment.user.username,
-                commentedByUser = comment.user.id == userId
+                commentedByUser = comment.user.id == userId,
+                postId = comment.post.id!!
             )
 
         }
