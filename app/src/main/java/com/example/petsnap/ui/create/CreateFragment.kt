@@ -59,6 +59,11 @@ class CreateFragment : Fragment() {
             val file = selectedFile
             val text = binding.editPostText.text.toString()
 
+            if (text.length > 255) {
+                Toast.makeText(requireContext(), "Your text is too long", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
             val sharedPreferences =
                 requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
             val userId = sharedPreferences.getLong("user_id", -1L)

@@ -65,20 +65,24 @@ class CommentAdapter(
 
                         deleteDialog.show()
 
-                        // удаление комментария
-                        deletebinding.buttonDeleteComment.setOnClickListener {
+                    }
 
-                            commentsViewModel.removeComment(userId, comment.id, comment.postId)
+                    // удаление комментария
+                    deletebinding.buttonDeleteComment.setOnClickListener {
 
-                            deleteDialog.hide()
+                        commentsViewModel.removeComment(userId, comment.id, comment.postId)
 
-                            // сообщить homeAdapter об удалении комментария
-                            onCommentDeleted(comment.postId)
+                        deleteDialog.hide()
 
-                            notifyItemRemoved(bindingAdapterPosition)
+                        // сообщить homeAdapter об удалении комментария
+                        onCommentDeleted(comment.postId)
 
-                        }
+                        notifyItemRemoved(bindingAdapterPosition)
 
+                    }
+
+                    deletebinding.buttonCancel.setOnClickListener {
+                        deleteDialog.hide()
                     }
                 }
             }
