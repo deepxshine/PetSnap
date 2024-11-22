@@ -8,8 +8,12 @@ import com.example.petsnap.R
 import com.example.petsnap.databinding.RvFragmentSearchBinding
 import com.example.petsnap.domain.model.UserSearchResponse
 
-class UsersAdapter(private var users: List<UserSearchResponse>) :
-    RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
+
+class UsersAdapter(
+    private var users: List<UserSearchResponse>
+) : RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
+
+    private var onItemClickListener: ((UserSearchResponse) -> Unit)? = null
 
     inner class UserViewHolder(val binding: RvFragmentSearchBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -26,17 +30,23 @@ class UsersAdapter(private var users: List<UserSearchResponse>) :
                 .load(user.avatar)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .into(avatarImageView)
+
+            root.setOnClickListener {
+                onItemClickListener?.invoke(user) // Вызываем слушатель клика
+            }
         }
     }
 
     override fun getItemCount(): Int = users.size
 
-    //обновление списка пользователей
+    // Метод для обновления пользователей
     fun updateUsers(newUsers: List<UserSearchResponse>) {
         users = newUsers
         notifyDataSetChanged()
     }
+
+    // Установка слушателя кликов
+    fun setOnItemClickListener(listener: (UserSearchResponse) -> Unit) {
+        onItemClickListener = listener
+    }
 }
-
-
-

@@ -9,8 +9,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.petsnap.R
 import com.example.petsnap.databinding.FragmentSearchBinding
+import com.example.petsnap.ui.profile.UserProfileFragment
 import com.example.petsnap.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,7 +39,12 @@ class SearchFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
 
-        //слушатель изменений текста для поиска
+        // Устанавливаем слушатель кликов
+        usersAdapter.setOnItemClickListener { user ->
+            showUserProfile(user.id)
+        }
+
+        // Слушатель изменений текста для поиска
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
@@ -48,6 +56,7 @@ class SearchFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
     }
+
 
     private fun setupRecyclerView() {
         usersAdapter = UsersAdapter(listOf())
@@ -85,6 +94,13 @@ class SearchFragment : Fragment() {
                 }
             }
         }
+    }
+
+    // Показываем профиль пользователя внутри текущего фрагмента
+    private fun showUserProfile(userId: Long) {
+        findNavController().navigate(R.id.navigation_user_profile, Bundle().apply {
+            putLong("userId", userId)
+        })
     }
 
     override fun onDestroyView() {
