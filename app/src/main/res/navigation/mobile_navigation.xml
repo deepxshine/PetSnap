@@ -15,7 +15,11 @@
         android:id="@+id/navigation_search"
         android:name="com.example.petsnap.ui.search.SearchFragment"
         android:label="@string/title_search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/navigation_user_profile"
+            app:destination="@id/navigation_user_profile" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_create"
@@ -34,5 +38,15 @@
         android:name="com.example.petsnap.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/navigation_user_profile"
+        android:name="com.example.petsnap.ui.profile.UserProfileFragment"
+        android:label="User Profile">
+        <argument
+            android:name="userId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
 
 </navigation>

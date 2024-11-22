@@ -5,6 +5,7 @@ import com.example.petsnap.domain.model.FollowAndUnfollowRequest
 import com.example.petsnap.domain.model.FriendshipResponse
 import com.example.petsnap.domain.model.UserFollowersAndFollowings
 import com.example.petsnap.domain.model.UserProfile
+import com.example.petsnap.domain.model.UserSearchResponse
 import com.example.petsnap.domain.repository.UserRepository
 import com.example.petsnap.utils.Resource
 import kotlinx.coroutines.Dispatchers
@@ -57,5 +58,9 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Resource.error(e.message ?: "Unknown error", null)
         }
+    }
+
+    override suspend fun searchUsers(username: String): List<UserSearchResponse> {
+        return userService.searchUsers(username)
     }
 }
