@@ -1,5 +1,6 @@
 package com.example.petsnap.di
 
+import com.example.petsnap.data.remote.CommentService
 import com.example.petsnap.data.remote.LoginService
 import com.example.petsnap.data.remote.PostService
 import com.example.petsnap.data.remote.RegisterService
@@ -31,7 +32,7 @@ object NetworkModule {
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create()) // Для JSON
             .build()
-    }
+    } 
 
     @Provides
     @Singleton
@@ -55,5 +56,11 @@ object NetworkModule {
     @Singleton
     fun providePostService(retrofit: Retrofit): PostService {
         return retrofit.create(PostService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCommentService(retrofit: Retrofit): CommentService {
+        return retrofit.create(CommentService::class.java)
     }
 }
