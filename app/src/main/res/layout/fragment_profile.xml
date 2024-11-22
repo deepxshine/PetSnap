@@ -2,15 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="20dp"
+    android:background="@color/white">
 
     <ImageView
         android:id="@+id/avatarImageView"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="start"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_launcher_foreground" />
 
@@ -18,11 +19,12 @@
         android:id="@+id/usernameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_marginLeft="100dp"
         android:paddingTop="16dp"
         android:text="@string/username"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_marginTop="-70dp"/>
 
     <TextView
         android:id="@+id/bioTextView"
@@ -30,7 +32,7 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:text="@string/bio"
-        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
         android:paddingTop="8dp" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -38,6 +40,6 @@
         android:paddingTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/rv_fragment_profile" />
+        tools:listitem="@layout/rv_fragment_profile"/>
 
 </LinearLayout>

@@ -77,6 +77,9 @@ class CreateFragment : Fragment() {
 
             viewModel.createPost(file, text, userId)
 
+            binding.editPostText.text.clear()
+            binding.addPostImage.setImageResource(R.mipmap.ic_add)
+
         }
 
         binding.cancelCreateButton.setOnClickListener {
@@ -96,7 +99,7 @@ class CreateFragment : Fragment() {
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
 
                     // Navigate to the homeFragment screen
-                    findNavController().navigate(R.id.navigation_home)
+//                    findNavController().navigate(R.id.navigation_home)
 
                 }
 
