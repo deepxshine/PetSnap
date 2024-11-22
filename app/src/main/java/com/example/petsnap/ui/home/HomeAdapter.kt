@@ -115,7 +115,7 @@ class HomeAdapter(
                     post.likedByUser = !post.likedByUser
 
                     val newLikeColor = if (post.likedByUser) {
-                        ContextCompat.getColor(itemView.context, R.color.red)
+                        ContextCompat.getColor(itemView.context, R.color.light_red)
                     } else {
                         ContextCompat.getColor(itemView.context, R.color.black)
                     }
