@@ -83,7 +83,7 @@ class CreateFragment : Fragment() {
         }
 
         binding.cancelCreateButton.setOnClickListener {
-            findNavController().navigateUp() // back to the page before
+            return@setOnClickListener // back to the page before
         }
 
 
