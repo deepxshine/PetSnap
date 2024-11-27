@@ -67,6 +67,10 @@ struct HomeView: View {
                                 }
                             }
                             .buttonStyle(BorderlessButtonStyle())
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/ios_new
                             Spacer()
                             Button(action: {
                                 selectedPostId = post.id

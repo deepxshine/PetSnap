@@ -1,1 +1,38 @@
-PetSnap/.DS_Store
+# Системные файлы
+.DS_Store
+
+# Файлы Xcode
+*.xcworkspace
+*.xcuserstate
+*.xcscheme
+DerivedData/
+*.hmap
+*.ipa
+*.app
+*.dSYM
+
+# Кэш и временные файлы
+*.swp
+*.lock
+*.tmp
+*.log
+*.o
+*.class
+*.so
+*.dylib
+
+# Зависимости
+Pods/
+Carthage/
+*.xcuserdatad/
+*.xcuserdata/
+*.framework
+*.a
+*.modulemap
+
+# Личные настройки
+*.user
+*.sublime-workspace
+*.sublime-project
+.idea/
+.vscode/

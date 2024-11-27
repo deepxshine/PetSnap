@@ -9,13 +9,13 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var appViewModel: AppViewController
-    
+
     var body: some View {
         VStack {
             Text("Профиль")
                 .font(.largeTitle)
                 .padding()
-            
+
             Button(action: {
                 appViewModel.logout() // Выход из системы
             }) {

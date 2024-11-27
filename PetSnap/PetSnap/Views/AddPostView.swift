@@ -1,16 +1,20 @@
-//
-//  AddPostView.swift
-//  PenSnap
-//
-//  Created by Алексей Евдокимов on 19.10.2024.
-//
-
+import PhotosUI
 import SwiftUI
 
 struct AddPostView: View {
     var body: some View {
-        Text("Добавить пост")
-            .font(.largeTitle)
-            .padding()
+        TabView {
+            CameraView()
+
+                .tabItem {
+                    Label("Камера", systemImage: "camera")
+                }
+
+            GalleryView()
+
+                .tabItem {
+                    Label("Галерея", systemImage: "photo")
+                }
+        }
     }
 }
