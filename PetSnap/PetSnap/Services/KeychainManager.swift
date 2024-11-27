@@ -86,6 +86,5 @@ class KeychainManager {
          return (tokenStatus == errSecSuccess || tokenStatus == errSecItemNotFound) &&
                  (userIdStatus == errSecSuccess || userIdStatus == errSecItemNotFound)
          
-         
     }
 }

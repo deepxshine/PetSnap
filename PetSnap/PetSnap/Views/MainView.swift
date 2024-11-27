@@ -30,6 +30,12 @@ struct MainView: View {
                 }
                 .tag(1)
             
+            SubscriberView()
+                .tabItem {
+                    Image(systemName: "person.2")
+                }
+                .tag(4)
+            
             
             
             ProfileView()
