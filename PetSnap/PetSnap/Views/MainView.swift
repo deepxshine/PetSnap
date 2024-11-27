@@ -28,11 +28,7 @@ struct MainView: View {
                 .tabItem {
                     Image(systemName: "plus.square")
                 }
-                .tag(1)
-<<<<<<< HEAD
 
-=======
-            
             SubscriberView()
                 .tabItem {
                     Image(systemName: "person.2")
@@ -40,8 +36,6 @@ struct MainView: View {
                 .tag(4)
             
             
-            
->>>>>>> origin/ios_new
             ProfileView()
                 .tabItem {
                     Image(systemName: "person")

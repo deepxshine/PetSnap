@@ -57,6 +57,7 @@ struct HomeView: View {
                         .padding(.vertical)
                         .padding(.leading, 10)
                         .padding(.bottom, 20)
+                        
                         HStack {
                             Button(action: {
                                 toggleLike(for: post)
@@ -67,11 +68,9 @@ struct HomeView: View {
                                 }
                             }
                             .buttonStyle(BorderlessButtonStyle())
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/ios_new
+                            
                             Spacer()
+                            
                             Button(action: {
                                 selectedPostId = post.id
                                 showCommentsView.toggle()
@@ -91,7 +90,7 @@ struct HomeView: View {
 
                 if !isFinished && isLoading {
                     ProgressView("Загрузка дополнительных постов...")
-                        .frame(maxWidth: . infinity, alignment: .center)
+                        .frame(maxWidth: .infinity, alignment: .center)
                         .padding()
                 }
 
@@ -105,7 +104,7 @@ struct HomeView: View {
             .listStyle(PlainListStyle())
             .sheet(isPresented: $showCommentsView) {
                 if let postId = selectedPostId {
-                    CommentsView(postViewController: postViewController,  postId: postId)
+                    CommentsView(postViewController: postViewController, postId: postId)
                 }
             }
             .refreshable {
@@ -116,11 +115,10 @@ struct HomeView: View {
     }
     
     private func updateCommentsCount(for postId: Int, newCount: Int) {
-           if let index = posts.firstIndex(where: { $0.id == postId }) {
-               posts[index].commentsCount = newCount
-           }
-
-       }
+        if let index = posts.firstIndex(where: { $0.id == postId }) {
+            posts[index].commentsCount = newCount
+        }
+    }
 
     private func loadMorePosts() {
         guard !isLoading else { return }
@@ -148,17 +146,16 @@ struct HomeView: View {
     }
     
     private func refreshPosts() {
-            currentPage = 0 // Сбрасываем номер страницы
-            posts.removeAll() // Очищаем текущие посты
-            loadPosts(page: currentPage) // Загружаем посты заново
-
-        }
+        currentPage = 0 // Сбрасываем номер страницы
+        posts.removeAll() // Очищаем текущие посты
+        loadPosts(page: currentPage) // Загружаем посты заново
+    }
 
     private func toggleLike(for post: Post) {
         postViewController.likePost(postId: post.id) { success in
             if success == true {
                 // Обновляем состояние поста в массиве posts
-                if let index = posts.firstIndex(where: { $0.id == post.id }) {
+                if let index = posts .firstIndex(where: { $0.id == post.id }) {
                     posts[index].likedByUser .toggle() // Переключаем состояние likedByUser
                     posts[index].likesCount += posts[index].likedByUser  ? 1 : -1 // Обновляем количество лайков
                 }

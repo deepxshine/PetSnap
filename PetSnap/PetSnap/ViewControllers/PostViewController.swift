@@ -12,27 +12,13 @@ class PostViewController: ObservableObject {
     @Published var appViewModel = AppViewController()
     @Published var comments: [Comment] = []
     @Published var errorMessage: String?
-    private var userId = KeychainManager.shared.getCredentials().userId
-<<<<<<< HEAD
-=======
     @Published var posts: [Post] = [] // Массив постов для обновления
->>>>>>> origin/ios_new
+    private var userId = KeychainManager.shared.getCredentials().userId
 
     init() {
         appViewModel.checkAuthStatus()
     }
-<<<<<<< HEAD
 
-    func getPosts(page: Int, completion: @escaping ([Post]?) -> Void) {
-        if let userId = userId {
-            PostController.shared.getPosts(userId: userId, page: page) { result in
-                switch result {
-                case let .success(posts):
-                    completion(posts)
-
-                case .failure:
-=======
-    
     func getPosts(page: Int, completion: @escaping ([Post]?) -> Void) {
         if let userId = self.userId {
             PostController.shared.getPosts(userId: userId, page: page) { result in
@@ -49,7 +35,7 @@ class PostViewController: ObservableObject {
             }
         }
     }
-    
+
     func likePost(postId: Int, completion: @escaping (Bool?) -> Void) {
         PostController.shared.likePost(postId: postId) { result in
             DispatchQueue.main.async { // Обеспечиваем выполнение на главном потоке
@@ -58,24 +44,12 @@ class PostViewController: ObservableObject {
                     completion(result)
                     
                 case .failure(_):
->>>>>>> origin/ios_new
                     completion(nil)
                 }
             }
         }
     }
-<<<<<<< HEAD
 
-    func likePost(postId: Int, completion: @escaping (Bool?) -> Void) {
-        PostController.shared.likePost(postId: postId) { result in
-            switch result {
-            case let .success(result):
-                completion(result)
-
-            case .failure:
-                completion(nil)
-=======
-    
     func getComments(postId: Int, page: Int) {
         guard let userId = self.userId else {
             errorMessage = "User  ID is not available."
@@ -143,7 +117,6 @@ class PostViewController: ObservableObject {
         }
     }
     
-    
     func updateCommentsCount(for postId: Int, increment: Bool) {
         DispatchQueue.main.async {
             if let index = self.posts.firstIndex(where: { $0.id == postId }) {
@@ -152,7 +125,6 @@ class PostViewController: ObservableObject {
                 } else {
                     self.posts[index].commentsCount -= 1
                 }
->>>>>>> origin/ios_new
             }
         }
     }

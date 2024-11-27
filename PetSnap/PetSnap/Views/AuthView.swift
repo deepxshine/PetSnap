@@ -5,7 +5,6 @@
 //  Created by Алексей Евдокимов on 18.10.2024.
 //
 
-// Views/LoginView.swift
 import SwiftUI
 
 struct AuthView: View {

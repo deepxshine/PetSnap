@@ -74,7 +74,6 @@ class KeychainManager {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: "authToken",
         ]
-<<<<<<< HEAD
         let userIdQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: "userId",
@@ -85,18 +84,5 @@ class KeychainManager {
 
         return (tokenStatus == errSecSuccess || tokenStatus == errSecItemNotFound) &&
             (userIdStatus == errSecSuccess || userIdStatus == errSecItemNotFound)
-=======
-         let userIdQuery: [String: Any] = [
-             kSecClass as String: kSecClassGenericPassword,
-             kSecAttrAccount as String: "userId"
-         ]
-         
-         let tokenStatus = SecItemDelete(tokenQuery as CFDictionary)
-         let userIdStatus = SecItemDelete(userIdQuery as CFDictionary)
-         
-         return (tokenStatus == errSecSuccess || tokenStatus == errSecItemNotFound) &&
-                 (userIdStatus == errSecSuccess || userIdStatus == errSecItemNotFound)
-         
->>>>>>> origin/ios_new
     }
 }
