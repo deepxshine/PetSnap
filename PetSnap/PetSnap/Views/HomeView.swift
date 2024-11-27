@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var postViewModel = PostViewController()
+    @StateObject private var postViewController = PostViewController()
     @State private var posts: [Post] = []
     @State private var isLoading = false
     @State private var isFinished = false
     @State private var currentPage = 0
+    @State private var selectedPostId: Int? // Для хранения выбранного поста для комментариев
+    @State private var showCommentsView = false // Для управления отображением окна комментариев
 
     var body: some View {
         NavigationStack {
@@ -32,17 +34,17 @@ struct HomeView: View {
                             }
                         }
                         .padding(.bottom, -10)
-
+                        
                         VStack(alignment: .leading) {
                             Text(post.user.username)
                                 .font(.headline)
                                 .foregroundColor(.black)
-
+                            
                             if let text = post.text {
                                 Text(text)
                                     .font(.callout)
                             }
-
+                            
                             Text(post.postTime)
                             HStack {
                                 Text("Количество лайков: \(post.likesCount)")
@@ -55,24 +57,24 @@ struct HomeView: View {
                         .padding(.vertical)
                         .padding(.leading, 10)
                         .padding(.bottom, 20)
-
-                        // Кнопки лайков и комментариев
                         HStack {
                             Button(action: {
                                 toggleLike(for: post)
                             }) {
                                 HStack {
-                                    Image(systemName: post.likedByUser ? "hand.thumbsup.fill" : "hand.thumbsup")
+                                    Image(systemName: post.likedByUser  ? "hand.thumbsup.fill" : "hand.thumbsup")
                                     Text("Лайк")
                                 }
                             }
                             .buttonStyle(BorderlessButtonStyle())
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/ios_new
                             Spacer()
-
                             Button(action: {
-                                // Логика для отображения комментариев
-                                print("Commented on post \(post.id)")
+                                selectedPostId = post.id
+                                showCommentsView.toggle()
                             }) {
                                 HStack {
                                     Image(systemName: "message")
@@ -89,7 +91,7 @@ struct HomeView: View {
 
                 if !isFinished && isLoading {
                     ProgressView("Загрузка дополнительных постов...")
-                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxWidth: . infinity, alignment: .center)
                         .padding()
                 }
 
@@ -101,9 +103,24 @@ struct HomeView: View {
             }
             .navigationTitle("")
             .listStyle(PlainListStyle())
+            .sheet(isPresented: $showCommentsView) {
+                if let postId = selectedPostId {
+                    CommentsView(postViewController: postViewController,  postId: postId)
+                }
+            }
+            .refreshable {
+                refreshPosts()
+            }
         }
         .padding(0)
     }
+    
+    private func updateCommentsCount(for postId: Int, newCount: Int) {
+           if let index = posts.firstIndex(where: { $0.id == postId }) {
+               posts[index].commentsCount = newCount
+           }
+
+       }
 
     private func loadMorePosts() {
         guard !isLoading else { return }
@@ -113,7 +130,7 @@ struct HomeView: View {
     }
 
     private func loadPosts(page: Int) {
-        postViewModel.getPosts(page: page) { fetchedPosts in
+        postViewController.getPosts(page: page) { fetchedPosts in
             DispatchQueue.main.async {
                 if let fetchedPosts = fetchedPosts, !fetchedPosts.isEmpty {
                     self.posts.append(contentsOf: fetchedPosts)
@@ -129,14 +146,21 @@ struct HomeView: View {
             }
         }
     }
+    
+    private func refreshPosts() {
+            currentPage = 0 // Сбрасываем номер страницы
+            posts.removeAll() // Очищаем текущие посты
+            loadPosts(page: currentPage) // Загружаем посты заново
+
+        }
 
     private func toggleLike(for post: Post) {
-        postViewModel.likePost(postId: post.id) { success in
+        postViewController.likePost(postId: post.id) { success in
             if success == true {
                 // Обновляем состояние поста в массиве posts
                 if let index = posts.firstIndex(where: { $0.id == post.id }) {
-                    posts[index].likedByUser.toggle() // Переключаем состояние likedByUser
-                    posts[index].likesCount += posts[index].likedByUser ? 1 : -1 // Обновляем количество лайков
+                    posts[index].likedByUser .toggle() // Переключаем состояние likedByUser
+                    posts[index].likesCount += posts[index].likedByUser  ? 1 : -1 // Обновляем количество лайков
                 }
             } else {
                 print("Ошибка при попытке поставить лайк на пост с ID \(post.id)")
