@@ -10,7 +10,7 @@ struct Post: Codable, Identifiable {
     let image: String
     let text: String?
     let user: User
-    let postTime: String 
+    let postTime: String
     let commentsCount: Int
     var likesCount: Int
     var likedByUser: Bool

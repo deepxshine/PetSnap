@@ -5,7 +5,6 @@
 //  Created by Алексей Евдокимов on 19.10.2024.
 //
 
-
 import SwiftUI
 
 struct HomeView: View {
@@ -68,7 +67,7 @@ struct HomeView: View {
                                 }
                             }
                             .buttonStyle(BorderlessButtonStyle())
-                            
+
                             Spacer()
 
                             Button(action: {
@@ -104,7 +103,6 @@ struct HomeView: View {
             .listStyle(PlainListStyle())
         }
         .padding(0)
-        
     }
 
     private func loadMorePosts() {

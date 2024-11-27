@@ -17,10 +17,10 @@ struct SearchView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .textInputAutocapitalization(.never)
                 .padding()
-                .onChange(of: searchViewController.username) { oldValue, newValue in
-                                    performSearch()
-                                }
-            
+                .onChange(of: searchViewController.username) { _, _ in
+                    performSearch()
+                }
+
             List(users) { user in
                 HStack {
                     AsyncImage(url: URL(string: user.avatar)) { image in
@@ -31,7 +31,7 @@ struct SearchView: View {
                     } placeholder: {
                         ProgressView()
                     }
-                    
+
                     Text(user.username)
                         .font(.headline)
                 }

@@ -8,23 +8,23 @@
 import Foundation
 import SwiftUI
 
-class SeachViewController: ObservableObject{
+class SeachViewController: ObservableObject {
     @Published var appViewModel = AppViewController()
     @Published var username: String = ""
     @Published var errorMessage: String? = nil
-    
+
     init() {
         appViewModel.checkAuthStatus()
     }
-    
-    func search(completion: @escaping([User]?) -> Void){
+
+    func search(completion: @escaping ([User]?) -> Void) {
         if username != "" {
-            SearchController.shared.search(username: username){result in
+            SearchController.shared.search(username: username) { result in
                 switch result {
-                case .success(let user):
+                case let .success(user):
                     completion(user)
-                    
-                case .failure(let error):
+
+                case let .failure(error):
                     print(error)
                     completion(nil)
                 }

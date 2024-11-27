@@ -1,5 +1,5 @@
 //
-//  GetPost.swift
+//  GetPostResponse.swift
 //  PenSnap
 //
 //  Created by Алексей Евдокимов on 08.11.2024.
