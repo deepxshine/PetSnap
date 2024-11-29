@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.example.petsnap.R
 import com.example.petsnap.databinding.FragmentCreateBinding
 import com.example.petsnap.utils.FileUtils
@@ -77,6 +76,9 @@ class CreateFragment : Fragment() {
 
             viewModel.createPost(file, text, userId)
 
+            val message = "Post created successfully"
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+
             binding.editPostText.text.clear()
             binding.addPostImage.setImageResource(R.mipmap.ic_add)
 
@@ -95,9 +97,6 @@ class CreateFragment : Fragment() {
             when (result.status) {
                 Status.SUCCESS -> {
                     successStateView()
-                    val message = "Post created successfully"
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-
                     // Navigate to the homeFragment screen
 //                    findNavController().navigate(R.id.navigation_home)
 

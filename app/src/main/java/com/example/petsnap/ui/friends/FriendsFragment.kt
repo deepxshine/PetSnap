@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -13,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.petsnap.R
 import com.example.petsnap.databinding.FragmentFriendsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -51,6 +53,8 @@ class FriendsFragment : Fragment() {
         setUpRV()
 
         binding.followerButton.setOnClickListener {
+            it.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.carrot_orange))
+            binding.followingButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.light_brown))
 
             binding.rvFragmentFriends.adapter = followersAdapter
             viewModel.uiState.value.let { state ->
@@ -63,6 +67,8 @@ class FriendsFragment : Fragment() {
         }
 
         binding.followingButton.setOnClickListener {
+            it.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.carrot_orange))
+            binding.followerButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.light_brown))
 
             binding.rvFragmentFriends.adapter = followingsAdapter
             viewModel.uiState.value.let { state ->

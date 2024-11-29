@@ -7,16 +7,24 @@
     android:padding="10dp"
     android:background="@color/white">
 
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:backgroundTint="@color/gray"
-        android:gravity="center"
-        android:padding="8dp"
-        android:text="Back to search"
-        android:textColor="@android:color/black" />
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        android:gravity="end"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
+
+<!--    <Button-->
+<!--        android:id="@+id/backButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="16dp"-->
+<!--        android:backgroundTint="@color/gray"-->
+<!--        android:gravity="center"-->
+<!--        android:padding="8dp"-->
+<!--        android:text="Back to search"-->
+<!--        android:textColor="@android:color/black" />-->
 
     <ImageView
         android:id="@+id/avatarImageView"

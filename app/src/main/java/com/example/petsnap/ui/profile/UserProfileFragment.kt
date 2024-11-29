@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -40,6 +41,18 @@ class UserProfileFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
 
+        // Toolbar title
+        binding.toolbar.title = "back to search"
+
+        // set toolbar back arrow button
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // set click listener
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
         val userId = arguments?.getLong("userId") ?: return
 //        viewModel.loadUserProfile(userId)
 
@@ -67,8 +80,9 @@ class UserProfileFragment : Fragment() {
                 }
             }
         })
-        setupBackNavigation()
+//        setupBackNavigation()
     }
+
 
     private fun setupRecyclerView() {
         postsAdapter = PostsAdapter(listOf())
@@ -127,14 +141,14 @@ class UserProfileFragment : Fragment() {
         postsAdapter.updatePosts(userProfile.posts)
     }
 
-    private fun setupBackNavigation() {
+//    private fun setupBackNavigation() {
 //        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
 //            findNavController().navigateUp()
 //        }
-        binding.backButton.setOnClickListener {
-            findNavController().navigateUp()
-        }
-    }
+//        binding.backButton.setOnClickListener {
+//            findNavController().navigateUp()
+//        }
+//    }
 
     override fun onDestroyView() {
         super.onDestroyView()
