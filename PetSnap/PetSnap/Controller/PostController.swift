@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import SwiftUI
 
 class PostController {
     static let shared = PostController()
     private let userId: String = .init(KeychainManager.shared.getCredentials().userId!)
     private let postUrl = ConstantsService.apiUrl + "/posts/main/"
     private let likeUrl = ConstantsService.apiUrl + "/posts/like/"
+    private let postPostUrl = ConstantsService.apiUrl + "/posts/createPost/"
 
     private init() {}
 
@@ -81,4 +83,52 @@ class PostController {
         task.resume()
         print("Request to fetch posts sent.")
     }
+    
+    
+    func createPost(userId: Int, image: UIImage, text: String, completion: @escaping (Result<Post, Error>) -> Void) {
+        guard let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: postPostUrl + "\(userId)?text=\(encodedText)") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+
+            let boundary = UUID().uuidString
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+            var data = Data()
+
+
+            data.append("--\(boundary)\r\n".data(using: .utf8)!)
+            data.append("Content-Disposition: form-data; name=\"file\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
+            data.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+            data.append(image.jpegData(compressionQuality: 0.8)!)
+            data.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+
+            let task = URLSession.shared.uploadTask(with: request, from: data) { responseData, response, error in
+
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+
+                guard let data = responseData else {
+                    completion(.failure(NSError(domain: "No data", code: -1, userInfo: nil)))
+                    return
+                }
+
+                do {
+                    let post = try JSONDecoder().decode(Post.self, from: data)
+                    completion(.success(post))
+                } catch {
+                    completion(.failure(error))
+                }
+            }
+
+            task.resume()
+
+        }
+
 }
+

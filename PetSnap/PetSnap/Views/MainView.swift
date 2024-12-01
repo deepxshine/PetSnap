@@ -28,6 +28,7 @@ struct MainView: View {
                 .tabItem {
                     Image(systemName: "plus.square")
                 }
+                .tag(5)
 
             SubscriberView()
                 .tabItem {
