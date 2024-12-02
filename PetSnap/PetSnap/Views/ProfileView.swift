@@ -8,6 +8,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var appViewModel: AppViewController
+
     @State private var profileImage: UIImage?
     @State private var showImagePicker = false
     @State private var bio: String = "Краткое описание о себе."
@@ -15,6 +16,7 @@ struct ProfileView: View {
     @State private var showLogoutConfirmation = false
     @State private var showEditProfile = false
     @State private var posts: [UserPost] = [] // Пустой массив постов для заглушки
+
 
     var body: some View {
         NavigationView {
@@ -69,6 +71,18 @@ struct ProfileView: View {
                     }
                 }
                 .padding()
+
+
+            Button(action: {
+                appViewModel.logout() // Выход из системы
+            }) {
+                Text("Выход")
+                    .font(.headline)
+                    .padding()
+                    .background(Color.red)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+
             }
             .navigationTitle("Профиль")
             .navigationBarTitleDisplayMode(.inline)

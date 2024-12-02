@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MainView: View {
     @State private var selectedTab = 0
-    
+
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeView()
@@ -17,19 +17,24 @@ struct MainView: View {
                     Image(systemName: "house")
                 }
                 .tag(0)
-            
+
             SearchView()
                 .tabItem {
                     Image(systemName: "magnifyingglass")
                 }
                 .tag(2)
-            
+
             AddPostView()
                 .tabItem {
                     Image(systemName: "plus.square")
                 }
-                .tag(1)
-            
+                .tag(5)
+
+            SubscriberView()
+                .tabItem {
+                    Image(systemName: "person.2")
+                }
+                .tag(4)
             
             
             ProfileView()
@@ -40,7 +45,6 @@ struct MainView: View {
         }
     }
 }
-
 
 #Preview {
     MainView()
