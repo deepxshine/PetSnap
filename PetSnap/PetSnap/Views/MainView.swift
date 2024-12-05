@@ -30,14 +30,14 @@ struct MainView: View {
                 }
                 .tag(5)
 
-            SubscriberView()
+            FollowView()
                 .tabItem {
                     Image(systemName: "person.2")
                 }
                 .tag(4)
             
             
-            ProfileView()
+            ProfileView(userId: 1)
                 .tabItem {
                     Image(systemName: "person")
                 }

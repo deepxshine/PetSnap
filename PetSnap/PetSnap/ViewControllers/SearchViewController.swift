@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-class SeachViewController: ObservableObject {
+class SearchViewController: ObservableObject {
     @Published var appViewModel = AppViewController()
     @Published var username: String = ""
     @Published var errorMessage: String? = nil

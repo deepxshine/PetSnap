@@ -8,39 +8,48 @@
 import SwiftUI
 
 struct SearchView: View {
-    @StateObject private var searchViewController = SeachViewController()
+    @StateObject private var searchViewController = SearchViewController()
     @State private var users: [User] = []
+    @State private var path = NavigationPath()
 
     var body: some View {
-        VStack {
-            TextField("Введите имя пользователя...", text: $searchViewController.username)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .textInputAutocapitalization(.never)
-                .padding()
-                .onChange(of: searchViewController.username) { _, _ in
-                    performSearch()
-                }
-
-            List(users) { user in
-                HStack {
-                    AsyncImage(url: URL(string: user.avatar)) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 50, height: 50)
-                    } placeholder: {
-                        ProgressView()
+        NavigationStack(path: $path) {
+            VStack {
+                TextField("Введите имя пользователя...", text: $searchViewController.username)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .textInputAutocapitalization(.never)
+                    .padding()
+                    .onChange(of: searchViewController.username) { _, _ in
+                        performSearch()
                     }
 
-                    Text(user.username)
-                        .font(.headline)
+                List(users, id: \.id) { user in
+                    NavigationLink(value: user.id) {
+                        HStack {
+                            AsyncImage(url: URL(string: user.avatar)) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 50, height: 50)
+                                    .cornerRadius(25)
+                            } placeholder: {
+                                ProgressView()
+                            }
+
+                            Text(user.username)
+                                .font(.headline)
+                        }
+                    }
                 }
             }
-        }
-        .navigationTitle("Поиск пользователей")
-        .onReceive(searchViewController.$username) { newValue in
-            if newValue.isEmpty {
-                users = []
+            .navigationTitle("Поиск пользователей")
+            .onReceive(searchViewController.$username) { newValue in
+                if newValue.isEmpty {
+                    users = []
+                }
+            }
+            .navigationDestination(for: Int.self) { userId in
+                ProfileView(userId: userId)
             }
         }
     }
@@ -60,11 +69,5 @@ struct SearchView: View {
                 }
             }
         }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        SearchView()
     }
 }
