@@ -50,7 +50,6 @@ class FollowController {
         print("Request to fetch followers and followings sent.")
     }
 
-    // Подписаться на пользователя
     func followUser(followerId: Int, followingId: Int, completion: @escaping (Result<FollowUser, Error>) -> Void) {
         guard let url = URL(string: "\(followUrl)\(followerId)/\(followingId)") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
@@ -85,7 +84,6 @@ class FollowController {
         print("Request to follow user sent.")
     }
 
-    // Отписаться от пользователя
     func unfollowUser(followerId: Int, followingId: Int, completion: @escaping (Result<FollowUser, Error>) -> Void) {
         guard let url = URL(string: "\(unfollowUrl)\(followerId)/\(followingId)") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))

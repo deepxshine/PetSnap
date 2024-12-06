@@ -12,7 +12,7 @@ class PostViewController: ObservableObject {
     @Published var appViewModel = AppViewController()
     @Published var comments: [Comment] = []
     @Published var errorMessage: String?
-    @Published var posts: [Post] = [] // Массив постов для обновления
+    @Published var posts: [Post] = []
     private var userId = KeychainManager.shared.getCredentials().userId
 
     init() {
@@ -25,7 +25,6 @@ class PostViewController: ObservableObject {
                     DispatchQueue.main.async {
                         switch result {
                         case .success(let posts):
-                            // Добавляем новые посты или заменяем существующие
                             if page == 0 {
                                 self.posts = posts
                             } else {
@@ -140,8 +139,8 @@ class PostViewController: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let commentResponse):
-                    self.comments.removeAll { $0.id == commentResponse.comment.id } // Удаляем комментарий из списка
-                    self.updateCommentsCount(for: postId, increment: false) // Обновляем количество комментариев
+                    self.comments.removeAll { $0.id == commentResponse.comment.id }
+                    self.updateCommentsCount(for: postId, increment: false) 
                     self.errorMessage = nil
                     print("Comment removed: \(commentResponse.comment.comment)")
 

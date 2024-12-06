@@ -10,42 +10,97 @@ import SwiftUI
 struct MainView: View {
     @State private var selectedTab = 0
 
+    init() {
+        UITabBar.appearance().backgroundColor = UIColor(red: 232 / 255, green: 226 / 255, blue: 214 / 255, alpha: 1)
+
+        UITabBar.appearance().barTintColor = UIColor(red: 232 / 255, green: 226 / 255, blue: 214 / 255, alpha: 1)
+    }
+
     var body: some View {
-        TabView(selection: $selectedTab) {
-            HomeView()
-                .tabItem {
-                    Image(systemName: "house")
-                }
-                .tag(0)
+        ZStack {
+            Image("Bg")
 
-            SearchView()
-                .tabItem {
-                    Image(systemName: "magnifyingglass")
-                }
-                .tag(2)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .edgesIgnoringSafeArea(.all)
 
-            AddPostView()
-                .tabItem {
-                    Image(systemName: "plus.square")
-                }
-                .tag(5)
+            VStack {
+                HeaderView()
+                    .background(Color.white.opacity(0))
+                    .padding(.top, 49)
 
-            FollowView()
-                .tabItem {
-                    Image(systemName: "person.2")
+                TabView(selection: $selectedTab) {
+                    HomeView()
+                        .background(Color.white.opacity(0))
+                        .tabItem {
+                            Image(selectedTab == 0 ? "HomeActive" : "HomeInactive")
+
+                                .renderingMode(.original)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                        }
+
+                        .tag(0)
+
+                    SearchView()
+
+                        .background(Color.white.opacity(0))
+                        .tabItem {
+                            Image(selectedTab == 2 ? "SearchActive" : "SearchInactive")
+                                .renderingMode(.original)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                        }
+
+                        .tag(2)
+
+                    AddPostView()
+                        .background(Color.white.opacity(0))
+                        .tabItem {
+                            Image(selectedTab == 5 ? "AddPostActive" : "AddPostInactive")
+
+                                .renderingMode(.original)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                        }
+
+                        .tag(5)
+
+                    FollowView()
+
+                        .background(Color.white.opacity(0))
+                        .tabItem {
+                            Image(selectedTab == 4 ? "SubsActive" : "SubsInactive")
+
+                                .renderingMode(.original)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                        }
+
+                        .tag(4)
+
+                    ProfileView(userId: 1)
+
+                        .background(Color.white.opacity(0))
+                        .tabItem {
+                            Image(selectedTab == 3 ? "ProfileActive" : "ProfileInactive")
+
+                                .renderingMode(.original)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                        }
+
+                        .tag(3)
                 }
-                .tag(4)
-            
-            
-            ProfileView(userId: 1)
-                .tabItem {
-                    Image(systemName: "person")
-                }
-                .tag(3)
+
+                .accentColor(.black)
+                
+            }
         }
     }
-}
-
-#Preview {
-    MainView()
 }

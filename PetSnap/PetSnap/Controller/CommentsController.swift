@@ -13,7 +13,6 @@ class CommentsController {
     
     private init() {}
     
-    // Добавление комментария
     func addComment(postId: Int, userId: Int, commentText: String, completion: @escaping(Result<CommentResponse, Error>) -> Void) {
         guard let url = URL(string: self.commentsUrl + "addComment/\(userId)/\(postId)") else {
             print("Invalid URL")
@@ -55,7 +54,6 @@ class CommentsController {
         print("Request to add comment sent.")
     }
     
-    // Получение комментариев
     func getComments(postId: Int, userId: Int, page: Int, completion: @escaping(Result<[Comment], Error>) -> Void) {
         guard let url = URL(string: self.commentsUrl + "\(postId)/\(userId)?page=\(page)&size=9") else {
             print("Invalid URL")
@@ -92,7 +90,6 @@ class CommentsController {
         print("Request to fetch comments sent.")
     }
     
-    // Удаление комментария
     func removeComment(commentId: Int, userId: Int, completion: @escaping(Result<CommentResponse, Error>) -> Void) {
         guard let url = URL(string: self.commentsUrl + "removeComment/\(userId)/\(commentId)") else {
             print("Invalid URL")

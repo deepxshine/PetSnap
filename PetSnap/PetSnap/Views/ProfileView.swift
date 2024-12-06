@@ -16,7 +16,7 @@ struct ProfileView: View {
     @State private var username: String = "Имя пользователя"
     @State private var showLogoutConfirmation = false
     @State private var showEditProfile = false
-    @State private var posts: [UserPost] = [] // Пустой массив постов для заглушки
+    @State private var posts: [UserPost] = [] 
     let userId: Int
 
     var body: some View {
@@ -74,7 +74,7 @@ struct ProfileView: View {
                 .padding()
 
                 Button(action: {
-                    appViewModel.logout() // Выход из системы
+                    appViewModel.logout() 
                 }) {
                     Text("Выход")
                         .font(.headline)
@@ -157,7 +157,6 @@ struct ProfileView: View {
                             }
                         }
 
-                        // Поле для ввода имени пользователя
                         TextField("Имя пользователя", text: $username)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                     }
@@ -190,7 +189,6 @@ struct ProfileView: View {
         }
     }
 
-    // Компонент для выбора изображения
     struct ImagePicker: UIViewControllerRepresentable {
         @Binding var image: UIImage?
 

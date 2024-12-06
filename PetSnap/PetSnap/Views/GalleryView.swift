@@ -5,8 +5,8 @@
 //  Created by Алексей Евдокимов on 27.11.2024.
 //
 
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct GalleryView: View {
     @State private var selectedItem: PhotosPickerItem? = nil
@@ -26,7 +26,7 @@ struct GalleryView: View {
                         .scaledToFit()
                         .frame(height: 250)
                         .padding()
-                    
+
                     // Форма для ввода описания
                     TextField("Введите описание", text: $descriptionText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -55,24 +55,26 @@ struct GalleryView: View {
                 // Кнопка выбора другого изображения
                 PhotosPicker(
                     selection: $selectedItem,
-                    matching: .images) {
-                        Text("Выбрать другое")
-                    }
-                    .onChange(of: selectedItem) { newItem in
-                        Task {
-                            guard let newItem = newItem else { return }
-                            do {
-                                if let data = try await newItem.loadTransferable(type: Data.self),
-                                   let uiImage = UIImage(data: data) {
-                                    selectedImage = Image(uiImage: uiImage)
-                                    selectedPhoto = uiImage // Сохранить выбранное фото
-                                    descriptionText = "" // Сбросить описание при выборе нового фото
-                                }
-                            } catch {
-                                print("Ошибка при загрузке изображения: \(error.localizedDescription)")
+                    matching: .images
+                ) {
+                    Text("Выбрать другое")
+                }
+                .onChange(of: selectedItem) { newItem in
+                    Task {
+                        guard let newItem = newItem else { return }
+                        do {
+                            if let data = try await newItem.loadTransferable(type: Data.self),
+                               let uiImage = UIImage(data: data)
+                            {
+                                selectedImage = Image(uiImage: uiImage)
+                                selectedPhoto = uiImage // Сохранить выбранное фото
+                                descriptionText = "" // Сбросить описание при выборе нового фото
                             }
+                        } catch {
+                            print("Ошибка при загрузке изображения: \(error.localizedDescription)")
                         }
                     }
+                }
             } else {
                 Button("Запросить доступ к галерее") {
                     requestPhotoLibraryAccess()
@@ -110,16 +112,16 @@ struct GalleryView: View {
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-        
-        photos = fetchResult.objects(at: IndexSet(integersIn: 0..<fetchResult.count))
+
+        photos = fetchResult.objects(at: IndexSet(integersIn: 0 ..< fetchResult.count))
     }
 
     private func getImage(asset: PHAsset) -> UIImage {
         let imageManager = PHImageManager.default()
-        var uiImage: UIImage = UIImage()
+        var uiImage = UIImage()
         let options = PHImageRequestOptions()
         options.isSynchronous = true
-        
+
         imageManager.requestImage(for: asset, targetSize: CGSize(width: 300, height: 300), contentMode: .aspectFill, options: options) { image, _ in
             if let img = image {
                 uiImage = img

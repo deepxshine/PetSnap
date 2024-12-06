@@ -16,8 +16,6 @@ struct AddPostView: View {
     var body: some View {
         NavigationView {
             VStack {
-                // Если фото не выбрано - показываем сетку галереи
-
                 if !isPhotoSelected {
                     ScrollView(.vertical) {
                         LazyVGrid(columns: [

@@ -1,10 +1,3 @@
-//
-//  CommentsView.swift
-//  PetSnap
-//
-//  Created by Алексей Евдокимов on 23.11.2024.
-//
-
 import SwiftUI
 
 struct CommentsView: View {
@@ -15,18 +8,34 @@ struct CommentsView: View {
     var body: some View {
         VStack {
             List {
-                // Проверяем, есть ли комментарии
                 if postViewController.comments.isEmpty {
                     Text("Комментариев нет.")
                         .foregroundColor(.gray)
                         .padding()
                 } else {
                     ForEach(postViewController.comments) { comment in
-                        HStack {
-                            Text(comment.comment)
-                                .padding()
-                            Spacer()
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text(comment.user.username)
+                                    .font(.headline)
+                                Spacer()
+                                Text(comment.commentTime) /
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            if let parsedComment = parseComment(from: comment.comment) {
+                                Text(parsedComment)
+                                    .padding(.top, 2)
+                                    .padding(.bottom, 5)
+                            } else {
+                                Text("Ошибка при распарсивании комментария")
+                                    .foregroundColor(.red)
+                            }
                         }
+                        .padding()
+                        .background(comment.commentedByUser  ? Color.blue.opacity(0.1) : Color.clear)
+                        .cornerRadius(8)
                         .swipeActions {
                             Button(role: .destructive) {
                                 deleteComment(commentId: comment.id)
@@ -37,11 +46,11 @@ struct CommentsView: View {
                     }
                 }
             }
-            
+
             HStack {
                 TextField("Введите комментарий", text: $newCommentText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                
+
                 Button(action: {
                     addComment()
                 }) {
@@ -51,7 +60,6 @@ struct CommentsView: View {
             .padding()
         }
         .onAppear {
-            // Получаем комментарии при появлении
             postViewController.getComments(postId: postId, page: 0)
         }
     }
@@ -60,10 +68,31 @@ struct CommentsView: View {
         guard !newCommentText.isEmpty else { return }
 
         postViewController.addComment(postId: postId, commentText: newCommentText)
-        newCommentText = "" // Очистить текстовое поле после отправки
+        newCommentText = "" /
     }
 
     private func deleteComment(commentId: Int) {
         postViewController.removeComment(commentId: commentId, postId: postId)
     }
+
+    private func parseComment(from jsonString: String) -> String? {
+        let jsonData = jsonString.data(using: .utf8)
+        
+        guard let data = jsonData else {
+            print("Ошибка при преобразовании строки в данные.")
+            return nil
+        }
+        
+        let decoder = JSONDecoder()
+        
+        do {
+            let commentObject = try decoder.decode(CommentObject.self, from: data)
+            return commentObject.comment
+        } catch {
+            print("Ошибка при декодировании JSON: \(error)")
+            return nil
+        }
+    }
 }
+
+
