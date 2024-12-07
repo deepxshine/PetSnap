@@ -36,20 +36,17 @@ struct ProfileView: View {
                             }
                             .padding()
 
-                            // Имя пользователя
                             Text(profile.username)
                                 .font(.title)
                                 .fontWeight(.bold)
                                 .multilineTextAlignment(.center)
 
-                            // Био
                             Text(profile.bio ?? "")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                                 .multilineTextAlignment(.center)
                                 .padding(.bottom)
 
-                            // Посты
                             if profile.posts.isEmpty {
                                 Text("Нет постов")
                                     .foregroundColor(.gray)
@@ -83,7 +80,6 @@ struct ProfileView: View {
                     }
                 }
             }
-            .navigationTitle("Профиль")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

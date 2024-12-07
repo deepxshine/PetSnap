@@ -42,7 +42,6 @@ struct SearchView: View {
                     }
                 }
             }
-            .navigationTitle("Поиск пользователей")
             .onReceive(searchViewController.$username) { newValue in
                 if newValue.isEmpty {
                     users = []

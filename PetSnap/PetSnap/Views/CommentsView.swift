@@ -19,7 +19,7 @@ struct CommentsView: View {
                                 Text(comment.user.username)
                                     .font(.headline)
                                 Spacer()
-                                Text(comment.commentTime)
+                                Text(DateFormatterService.shared.formatPostDate(comment.commentTime))
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
                             }

@@ -83,7 +83,7 @@ struct MainView: View {
 
                         .tag(4)
 
-                    ProfileView(userId: 1)
+                    ProfileView(userId:KeychainManager.shared.getCredentials().userId ?? 1)
 
                         .background(Color.white.opacity(0))
                         .tabItem {
