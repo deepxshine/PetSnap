@@ -19,11 +19,11 @@ struct CommentsView: View {
                                 Text(comment.user.username)
                                     .font(.headline)
                                 Spacer()
-                                Text(comment.commentTime) /
+                                Text(comment.commentTime)
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
                             }
-                            
+
                             if let parsedComment = parseComment(from: comment.comment) {
                                 Text(parsedComment)
                                     .padding(.top, 2)
@@ -34,7 +34,7 @@ struct CommentsView: View {
                             }
                         }
                         .padding()
-                        .background(comment.commentedByUser  ? Color.blue.opacity(0.1) : Color.clear)
+                        .background(comment.commentedByUser ? Color.blue.opacity(0.1) : Color.clear)
                         .cornerRadius(8)
                         .swipeActions {
                             Button(role: .destructive) {
@@ -68,7 +68,7 @@ struct CommentsView: View {
         guard !newCommentText.isEmpty else { return }
 
         postViewController.addComment(postId: postId, commentText: newCommentText)
-        newCommentText = "" /
+        newCommentText = ""
     }
 
     private func deleteComment(commentId: Int) {
@@ -77,14 +77,14 @@ struct CommentsView: View {
 
     private func parseComment(from jsonString: String) -> String? {
         let jsonData = jsonString.data(using: .utf8)
-        
+
         guard let data = jsonData else {
             print("Ошибка при преобразовании строки в данные.")
             return nil
         }
-        
+
         let decoder = JSONDecoder()
-        
+
         do {
             let commentObject = try decoder.decode(CommentObject.self, from: data)
             return commentObject.comment
@@ -94,5 +94,3 @@ struct CommentsView: View {
         }
     }
 }
-
-

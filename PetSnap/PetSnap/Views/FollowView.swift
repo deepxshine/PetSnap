@@ -118,12 +118,12 @@ struct UserRow: View {
             Spacer()
 
             Button(action: {
-                if follower.followedByUser  {
-                    FollowController.shared.unfollowUser (followerId: userId, followingId: follower.id) { result in
+                if follower.followedByUser {
+                    FollowController.shared.unfollowUser(followerId: userId, followingId: follower.id) { result in
                         switch result {
                         case .success:
                             DispatchQueue.main.async {
-                                follower.followedByUser  = false
+                                follower.followedByUser = false
                             }
                             print("Successfully unfollowed user")
                         case let .failure(error):
@@ -131,11 +131,11 @@ struct UserRow: View {
                         }
                     }
                 } else {
-                    FollowController.shared.followUser (followerId: userId, followingId: follower.id) { result in
+                    FollowController.shared.followUser(followerId: userId, followingId: follower.id) { result in
                         switch result {
                         case .success:
                             DispatchQueue.main.async {
-                                follower.followedByUser  = true
+                                follower.followedByUser = true
                             }
                             print("Successfully followed user")
                         case let .failure(error):
@@ -145,10 +145,10 @@ struct UserRow: View {
                 }
             }) {
                 // Используем иконки из Assets
-                Image(follower.followedByUser  ? "UnfollowIcon" : "FollowIcon")
+                Image(follower.followedByUser ? "UnfollowIcon" : "FollowIcon")
                     .resizable()
                     .frame(width: 85, height: 30)
-                    .foregroundColor(follower.followedByUser  ? .red : .green) 
+                    .foregroundColor(follower.followedByUser ? .red : .green)
             }
         }
         .sheet(isPresented: $isProfilePresented) {

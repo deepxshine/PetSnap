@@ -5,8 +5,8 @@
 //  Created by Алексей Евдокимов on 04.12.2024.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 class FollowUser: Codable, Identifiable, ObservableObject {
     @Published var id: Int

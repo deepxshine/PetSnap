@@ -16,7 +16,7 @@ struct AuthView: View {
                 .resizable()
                 .scaledToFill()
                 .edgesIgnoringSafeArea(.all)
-            
+
             VStack {
                 HeaderView()
                     .background(Color.white.opacity(0))
@@ -25,7 +25,7 @@ struct AuthView: View {
                 Spacer(minLength: 20)
 
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(red: 238/255, green: 238/255, blue: 238/255))
+                    .fill(Color(red: 238 / 255, green: 238 / 255, blue: 238 / 255))
                     .frame(width: 380, height: 400)
                     .overlay(
                         VStack {
@@ -74,7 +74,7 @@ struct AuthView: View {
                                         .frame(width: 140, height: 55)
                                         .padding()
                                 }
-                                
+
                                 Button(action: {
                                     // Действие для регистрации
                                 }) {
@@ -87,7 +87,7 @@ struct AuthView: View {
                         }
                         .padding()
                     )
-                
+
                 Spacer(minLength: 300)
             }
         }

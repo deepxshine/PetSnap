@@ -1,226 +1,121 @@
 import SwiftUI
 
-struct UserPost: Identifiable {
-    let id = UUID()
-    let image: Image
-}
-
-import SwiftUI
-
 struct ProfileView: View {
+    @StateObject private var viewModel: ProfileViewModel
     @EnvironmentObject var appViewModel: AppViewController
 
     @State private var profileImage: UIImage?
     @State private var showImagePicker = false
-    @State private var bio: String = "Краткое описание о себе."
-    @State private var username: String = "Имя пользователя"
     @State private var showLogoutConfirmation = false
     @State private var showEditProfile = false
-    @State private var posts: [UserPost] = [] 
-    let userId: Int
+
+    init(userId: Int) {
+        _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userId))
+    }
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .center) {
-                    // Аватар профиля
-                    if let profileImage = profileImage {
-                        Image(uiImage: profileImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .clipShape(Circle())
-                            .padding()
-                    } else {
-                        Image("defaultProfile")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .clipShape(Circle())
-                            .padding()
-                    }
-
-                    // Имя пользователя
-                    Text(username)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.center)
-
-                    // Био
-                    Text(bio)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .multilineTextAlignment(.center)
-                        .padding(.bottom)
-
-                    // Проверка на наличие постов
-                    if posts.isEmpty {
-                        ProgressView("Загрузка постов...")
-                            .progressViewStyle(CircularProgressViewStyle())
-                            .padding()
-                    } else {
-                        LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 3), spacing: 10) {
-                            ForEach(posts) { post in
-                                post.image
+            Group {
+                if viewModel.isLoading {
+                    ProgressView("Загрузка профиля...")
+                } else if let profile = viewModel.profileResponse {
+                    ScrollView {
+                        VStack(alignment: .center) {
+                            // Аватар профиля
+                            AsyncImage(url: URL(string: profile.avatar ?? "")) { image in
+                                image.resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 100)
+                                    .clipShape(Circle())
+                            } placeholder: {
+                                Image("defaultProfile")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 120)
-                                    .cornerRadius(8)
+                                    .frame(width: 100, height: 100)
+                                    .clipShape(Circle())
                             }
-                        }
-                        .padding()
-                    }
-                }
-                .padding()
+                            .padding()
 
-                Button(action: {
-                    appViewModel.logout() 
-                }) {
-                    Text("Выход")
-                        .font(.headline)
-                        .padding()
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                .navigationTitle("Профиль")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Menu {
-                            Button(action: {
-                                showEditProfile = true
-                            }) {
-                                Text("Изменить профиль")
-                            }
-                            Button(action: {
-                                showLogoutConfirmation = true
-                            }) {
-                                Text("Разлогиниться")
-                                    .foregroundColor(.red)
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
+                            // Имя пользователя
+                            Text(profile.username)
                                 .font(.title)
-                        }
-                        .actionSheet(isPresented: $showLogoutConfirmation) {
-                            ActionSheet(
-                                title: Text("Вы уверены, что хотите выйти?"),
-                                buttons: [
-                                    .destructive(Text("Разлогиниться")) {
-                                        appViewModel.logout()
-                                    },
-                                    .cancel(),
-                                ]
-                            )
-                        }
-                        .sheet(isPresented: $showEditProfile) {
-                            EditProfileView(profileImage: $profileImage, username: $username)
-                        }
-                    }
-                }
-            }
-        }
-    }
+                                .fontWeight(.bold)
+                                .multilineTextAlignment(.center)
 
-    struct EditProfileView: View {
-        @Binding var profileImage: UIImage?
-        @Binding var username: String
-        @Environment(\.presentationMode) var presentationMode
-        @State private var showImagePicker = false
-        @State private var selectedImage: UIImage?
+                            // Био
+                            Text(profile.bio ?? "")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+                                .padding(.bottom)
 
-        var body: some View {
-            NavigationView {
-                Form {
-                    Section(header: Text("Профиль")) {
-                        // Изображение профиля
-                        Button(action: {
-                            showImagePicker.toggle()
-                        }) {
-                            HStack {
-                                if let image = selectedImage ?? profileImage {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 100, height: 100)
-                                        .clipShape(Circle())
-                                } else {
-                                    Image(systemName: "person.crop.circle.fill")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 100, height: 100)
-                                        .foregroundColor(.gray)
+                            // Посты
+                            if profile.posts.isEmpty {
+                                Text("Нет постов")
+                                    .foregroundColor(.gray)
+                            } else {
+                                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 3), spacing: 10) {
+                                    ForEach(profile.posts) { post in
+                                        AsyncImage(url: URL(string: post.image)) { image in
+                                            image.resizable()
+                                                .scaledToFit()
+                                                .frame(height: 120)
+                                                .cornerRadius(8)
+                                        } placeholder: {
+                                            ProgressView()
+                                        }
+                                    }
                                 }
-                                Text("Изменить изображение")
-                                    .font(.headline)
-                            }
-                        }
-
-                        TextField("Имя пользователя", text: $username)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    }
-
-                    Section {
-                        Button(action: {
-                            // Сохранить изменения и закрыть экран
-                            if let selectedImage = selectedImage {
-                                profileImage = selectedImage
-                            }
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            Text("Сохранить")
-                                .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
+                            }
+                        }
+                        .padding()
+                    }
+                } else if let error = viewModel.error {
+                    VStack {
+                        Text("Ошибка загрузки профиля")
+                            .foregroundColor(.red)
+                        Text(error.localizedDescription)
+                            .foregroundColor(.gray)
+                        Button("Повторить") {
+                            viewModel.loadProfile()
                         }
                     }
                 }
-                .navigationTitle("Редактировать профиль")
-                .navigationBarItems(trailing: Button("Готово") {
-                    presentationMode.wrappedValue.dismiss()
-                })
-                .sheet(isPresented: $showImagePicker) {
-                    ImagePicker(image: $selectedImage)
+            }
+            .navigationTitle("Профиль")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        
+                        Button(action: {
+                            showLogoutConfirmation = true
+                        }) {
+                            Text("Выйти")
+                                .foregroundColor(.red)
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.title)
+                    }
                 }
             }
-        }
-    }
-
-    struct ImagePicker: UIViewControllerRepresentable {
-        @Binding var image: UIImage?
-
-        func makeCoordinator() -> Coordinator {
-            Coordinator(self)
-        }
-
-        func makeUIViewController(context: Context) -> UIImagePickerController {
-            let picker = UIImagePickerController()
-            picker.delegate = context.coordinator
-            return picker
-        }
-
-        func updateUIViewController(_: UIImagePickerController, context _: Context) {}
-
-        class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-            var parent: ImagePicker
-
-            init(_ parent: ImagePicker) {
-                self.parent = parent
+            .actionSheet(isPresented: $showLogoutConfirmation) {
+                ActionSheet(
+                    title: Text("Вы уверены, что хотите выйти?"),
+                    buttons: [
+                        .destructive(Text("Выйти")) {
+                            appViewModel.logout()
+                        },
+                        .cancel(),
+                    ]
+                )
             }
-
-            func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-                if let uiImage = info[.originalImage] as? UIImage {
-                    parent.image = uiImage
-                }
-                picker.dismiss(animated: true)
+            
             }
-
-            func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-                picker.dismiss(animated: true)
+            .onAppear {
+                viewModel.loadProfile()
             }
         }
-    }
 }

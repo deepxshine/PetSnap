@@ -28,11 +28,10 @@ struct HomeView: View {
                             showCommentsView.toggle()
                         }
                     )
-                  
+
                     .listRowBackground(Color.clear)
                     Spacer()
                 }
-                
 
                 if !isFinished && isLoading {
                     ProgressView("Загрузка дополнительных постов...")
@@ -51,7 +50,6 @@ struct HomeView: View {
                         .listRowBackground(Color.clear)
                 }
             }
-
 
             .background(Color.clear) // Прозрачный общий фон
             .listStyle(PlainListStyle())

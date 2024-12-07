@@ -13,5 +13,5 @@ struct Post: Codable, Identifiable {
     let postTime: String
     var commentsCount: Int // Изменено на var для возможности изменения
     var likesCount: Int
-    var likedByUser:  Bool
+    var likedByUser: Bool
 }

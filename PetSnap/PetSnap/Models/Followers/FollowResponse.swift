@@ -10,5 +10,4 @@ import Foundation
 struct FollowResponse: Codable {
     let followersList: [FollowUser]
     let followingsList: [FollowUser]
-
 }
